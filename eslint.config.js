@@ -1,4 +1,5 @@
 import js from '@eslint/js'
+import globals from 'globals'
 import prettier from 'eslint-config-prettier'
 
 export default [
@@ -8,11 +9,7 @@ export default [
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
-      globals: {
-        document: 'readonly',
-        window: 'readonly',
-        console: 'readonly',
-      },
+      globals: globals.browser,
     },
   },
 ]

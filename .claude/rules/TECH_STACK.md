@@ -24,6 +24,7 @@
 ## Linting & Formatting
 
 - **ESLint** (v9, flat config) — `eslint.config.js` uses `@eslint/js` recommended + `eslint-config-prettier`
+  - `globals` — provides the browser global set (`globals.browser`) so DOM/timer APIs (`setTimeout`, `requestAnimationFrame`, `IntersectionObserver`, …) don't trip `no-undef`. Lint only runs on `src/`, which is browser-only; `scripts/` is not linted.
 - **Prettier** — default config (no `.prettierrc` file, uses Prettier defaults)
 - Runs automatically before prod builds via `prebuild` script
 
@@ -45,5 +46,5 @@
 ## Dependencies
 
 - **Runtime**: `picocolors` (used by scripts only, not bundled to browser)
-- **Dev**: All other deps are devDependencies (Rollup, ESLint, Prettier, etc.)
+- **Dev**: All other deps are devDependencies (Rollup, ESLint, `globals`, Prettier, etc.)
 - No frontend framework — vanilla JavaScript only
