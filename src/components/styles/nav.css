@@ -1,0 +1,75 @@
+/*
+nav — estado scrolleado
+
+Los tres elementos los inyecta src/components/nav.js; acá viven solo sus
+estilos. No hay CSS de estado inicial (anti-FOUC) y es deliberado: los nodos
+no existen hasta que el JS corre, así que antes de eso el nav se ve
+exactamente como su CSS estático. Si GSAP no carga, nada cambia.
+*/
+
+/* La superficie sólida. Es un layer aparte y no el background de .nav para
+   poder animarla con `opacity` —compositor puro— sin hardcodear un color:
+   el token real es un light-dark(), así que animar `background-color`
+   rompería el theme. */
+[data-nav-bg] {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--nav-surface);
+  pointer-events: none;
+}
+
+/* Hairline inferior, crece desde el centro hacia los dos bordes.
+   Va DESPUÉS de [data-nav-bg] en el DOM: los dos comparten z-index, así que
+   el orden de pintado lo decide el orden de los hermanos. Al revés, la
+   superficie lo taparía. */
+[data-nav-line] {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  height: 1px;
+  background-color: var(--nav-line);
+  transform-origin: center;
+  pointer-events: none;
+}
+
+/* Sentinel del IntersectionObserver. Fuera del flujo, invisible, sin costo
+   de layout. Su alto lo escribe el JS desde SCROLLED.threshold. */
+[data-nav-sentinel] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  pointer-events: none;
+}
+
+/* Los colores del estado scrolleado.
+   Los fallbacks están porque Webflow solo emite una variable si alguna clase
+   la usa: si nadie consume Brand/Divider On Light, --_color---brand--divider-on-light
+   no existe en el CSS publicado y el hairline saldría transparente. */
+.nav {
+  --nav-surface: var(--primary--background, #fbfaf8);
+  --nav-line: var(--_color---brand--divider-on-light, rgb(71 77 51 / 0.2));
+}
+
+/*
+Inversión de color del texto — apagada.
+
+La superficie elegida es beige, o sea el mismo color que el nav ya tiene
+arriba, así que no hay nada que invertir. El JS lee estas dos variables y
+**si no están definidas no crea el tween**, que es como se apaga.
+
+Para prenderla (por ejemplo con una superficie Forest Green), descomentar y
+pasar `.nav-link` y `.nav-logo_link` a `color: inherit` en el Designer, para
+que un solo tween sobre .nav tiña todo el nav:
+
+.nav {
+  --nav-surface: var(--_color---brand--forest-green, #262f23);
+  --nav-line: var(--_color---brand--divider-on-dark, rgb(255 255 255 / 0.12));
+  --nav-text-scrolled: #f7f6f5;
+  --nav-cta-bg-scrolled: #fbfaf8;
+  --nav-cta-text-scrolled: #262f23;
+}
+*/

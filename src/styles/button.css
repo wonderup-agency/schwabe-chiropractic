@@ -1,0 +1,118 @@
+/*
+Button hover — colour inversion + arrow
+
+No JavaScript. The whole interaction is a colour swap and a rotation, which
+is what CSS transitions are for: it runs on the compositor, costs nothing at
+init across the site's 34 buttons, and works before (or without) any JS.
+
+What Webflow can't do on its own is style a *child* on the parent's hover —
+the disc and the arrow live inside the Button, so those rules live here.
+
+Loaded from global.js, so it ships in dist/styles.css on every page.
+*/
+
+/* ── Tokens ──────────────────────────────────────────────────────────
+   `motion.js` can't be imported into CSS, so the two values it would
+   provide are custom properties instead. 300ms and this curve are MAST's
+   own — `.button` already transitions background-color and border-color
+   with them, and matching means the button doesn't animate against
+   itself. Change these two and every part of the hover follows. */
+[data-btn] {
+  --btn-dur: 300ms;
+  --btn-ease: cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  /* ── The destination of the inversion ──────────────────────────────
+     Only the arrival values. The resting ones are whatever MAST already
+     has — restating them here would be a second copy free to drift. */
+  --btn-bg-hover: var(--_color---brand--beige);
+  --btn-fg-hover: var(--_color---brand--ink);
+  --btn-circle-bg-hover: var(--_color---brand--olive-green);
+  --btn-circle-fg-hover: var(--_color---brand--beige);
+}
+
+[data-btn].cc-secondary {
+  --btn-bg-hover: var(--_color---brand--ink);
+  --btn-fg-hover: var(--_color---brand--beige);
+  --btn-circle-bg-hover: var(--_color---brand--beige);
+  --btn-circle-fg-hover: var(--_color---brand--ink);
+}
+
+/* On a dark surface the inversion runs the other way. */
+.u-on-dark [data-btn].cc-secondary {
+  --btn-bg-hover: var(--_color---brand--beige);
+  --btn-fg-hover: var(--_color---brand--forest-green);
+  --btn-circle-bg-hover: var(--_color---brand--forest-green);
+  --btn-circle-fg-hover: var(--_color---brand--beige);
+}
+
+/* ── Transitions ─────────────────────────────────────────────────────
+   MAST already transitions background-color and border-color on
+   `.button`. Declaring the shorthand replaces that list, so `color` is
+   added back alongside the two it already had — dropping either would
+   make the border or background snap while the rest eases. */
+[data-btn] {
+  transition:
+    background-color var(--btn-dur) var(--btn-ease),
+    border-color var(--btn-dur) var(--btn-ease),
+    color var(--btn-dur) var(--btn-ease);
+}
+
+/* The disc. `.cc-circle` is our own combo and it is what makes the disc a
+   disc — targeting it means buttons whose right icon has no circle never
+   get a background painted behind a bare glyph. */
+[data-btn] [data-btn-icon] > .cc-circle {
+  transition:
+    background-color var(--btn-dur) var(--btn-ease),
+    color var(--btn-dur) var(--btn-ease);
+}
+
+/* The arrow. Matching the Phosphor glyph class rather than a position
+   means only the up-right arrow rotates — a button whose right icon is
+   some other glyph is left alone, which a `> * > *` selector could not
+   express. `inline-block` because a bare <span> can't be transformed. */
+[data-btn] [data-btn-icon] .ph-arrow-up-right {
+  display: inline-block;
+  transform-origin: 50% 50%;
+  transition: transform var(--btn-dur) var(--btn-ease);
+}
+
+/* ── The hover ───────────────────────────────────────────────────────
+   Real pointers only. On touch, `:hover` sticks after a tap and would
+   leave the button inverted with no way back. MAST's own `.button:hover`
+   is left untouched there, so touch behaves exactly as it does today.
+
+   The attribute is repeated on purpose. `.button[data-btn]:hover` is
+   (0,3,0), which beats `.button:hover` (0,2,0) — but it only *ties* with
+   a variant rule like `.button.cc-secondary:hover`, and a tie is decided
+   by load order, which we don't control. A tie here is not cosmetic: the
+   background stays put while the text still inverts, and a Secondary
+   button ends up light-on-light. Doubling the attribute makes it (0,4,0)
+   and settles it. */
+@media (hover: hover) and (pointer: fine) {
+  .button[data-btn][data-btn]:hover {
+    background-color: var(--btn-bg-hover);
+    color: var(--btn-fg-hover);
+  }
+
+  .button[data-btn][data-btn]:hover [data-btn-icon] > .cc-circle {
+    background-color: var(--btn-circle-bg-hover);
+    color: var(--btn-circle-fg-hover);
+  }
+
+  /* `ph-arrow-up-right` rests pointing 45° up-right, and CSS rotates
+     clockwise — so +45deg brings it to horizontal. -45 stands it upright;
+     the sign is easy to get backwards. */
+  .button[data-btn][data-btn]:hover [data-btn-icon] .ph-arrow-up-right {
+    transform: rotate(45deg);
+  }
+}
+
+/* Reduced motion is a state, not an off switch: the button still inverts
+   and the arrow still ends horizontal, nothing eases there. */
+@media (prefers-reduced-motion: reduce) {
+  [data-btn],
+  [data-btn] [data-btn-icon] > .cc-circle,
+  [data-btn] [data-btn-icon] .ph-arrow-up-right {
+    transition-duration: 0s;
+  }
+}
