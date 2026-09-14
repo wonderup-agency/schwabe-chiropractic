@@ -21,28 +21,57 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
   --btn-dur: 300ms;
   --btn-ease: cubic-bezier(0.165, 0.84, 0.44, 1);
 
-  /* ── The destination of the inversion ──────────────────────────────
+  /* How much colour the Secondary's wash carries. It's a mix against
+     `transparent`, not a flat token, so the tint reads the same over
+     beige, over olive light, and over anything added later — a flat
+     `#f1f3ed` would simply vanish on the olive-light sections. */
+  --btn-tint: 12%;
+
+  /* ── The destination ───────────────────────────────────────────────
      Only the arrival values. The resting ones are whatever MAST already
      has — restating them here would be a second copy free to drift. */
   --btn-bg-hover: var(--_color---brand--beige);
   --btn-fg-hover: var(--_color---brand--ink);
   --btn-circle-bg-hover: var(--_color---brand--olive-green);
   --btn-circle-fg-hover: var(--_color---brand--beige);
+
+  /* The Primary's border is `transparent` at rest, so when it inverts to
+     beige it has no edge left and dissolves into a light section. Giving
+     it the accent it came from keeps the footprint: the button hollows
+     out instead of disappearing. Set to `transparent` to turn that off. */
+  --btn-border-hover: var(--_color---brand--olive-green);
 }
 
-[data-btn].cc-secondary {
-  --btn-bg-hover: var(--_color---brand--ink);
+/* The Secondary doesn't invert — it washes.
+
+   Its border is never declared here, and that is deliberate: the variant
+   binds all four border colours to a Webflow variable (not to
+   `currentColor`, which is what this file used to assume). Nothing in the
+   hover can move it, so the safest way to keep it is to leave it alone —
+   restating it would mean naming a variable this file can't see. */
+[data-btn][data-wf--button--button-variant='secondary'] {
+  --btn-bg-hover: color-mix(
+    in srgb,
+    var(--_color---brand--olive-green) var(--btn-tint),
+    transparent
+  );
+  --btn-fg-hover: var(--_color---brand--ink);
+  /* The disc still turns green — it's the one part that carries colour. */
+  --btn-circle-bg-hover: var(--_color---brand--olive-green);
+  --btn-circle-fg-hover: var(--_color---brand--beige);
+}
+
+/* On a dark surface a green wash is invisible, so the lift is a beige
+   one. Same idea, same restraint, and the text stays put here too. */
+.u-on-dark [data-btn][data-wf--button--button-variant='secondary'] {
+  --btn-bg-hover: color-mix(
+    in srgb,
+    var(--_color---brand--beige) var(--btn-tint),
+    transparent
+  );
   --btn-fg-hover: var(--_color---brand--beige);
   --btn-circle-bg-hover: var(--_color---brand--beige);
-  --btn-circle-fg-hover: var(--_color---brand--ink);
-}
-
-/* On a dark surface the inversion runs the other way. */
-.u-on-dark [data-btn].cc-secondary {
-  --btn-bg-hover: var(--_color---brand--beige);
-  --btn-fg-hover: var(--_color---brand--forest-green);
-  --btn-circle-bg-hover: var(--_color---brand--forest-green);
-  --btn-circle-fg-hover: var(--_color---brand--beige);
+  --btn-circle-fg-hover: var(--_color---brand--forest-green);
 }
 
 /* ── Transitions ─────────────────────────────────────────────────────
@@ -81,17 +110,28 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
    leave the button inverted with no way back. MAST's own `.button:hover`
    is left untouched there, so touch behaves exactly as it does today.
 
-   The attribute is repeated on purpose. `.button[data-btn]:hover` is
-   (0,3,0), which beats `.button:hover` (0,2,0) — but it only *ties* with
-   a variant rule like `.button.cc-secondary:hover`, and a tie is decided
-   by load order, which we don't control. A tie here is not cosmetic: the
-   background stays put while the text still inverts, and a Secondary
-   button ends up light-on-light. Doubling the attribute makes it (0,4,0)
-   and settles it. */
+   The attribute is repeated on purpose, and it is not defensive. The
+   Secondary variant ships its own hover — Webflow compiles it to
+   `.button.w-variant-052759b4…:hover { background-color: <accent> }`,
+   which is (0,3,0). `.button[data-btn]:hover` is also (0,3,0), so the two
+   *tie* and load order decides — and we don't control load order.
+
+   A tie here isn't cosmetic: MAST's rule wins the background while ours
+   still wins the text, so a Secondary ends up washed by neither and
+   light-on-light. Doubling the attribute makes it (0,4,0) and settles
+   it. */
 @media (hover: hover) and (pointer: fine) {
   .button[data-btn][data-btn]:hover {
     background-color: var(--btn-bg-hover);
     color: var(--btn-fg-hover);
+  }
+
+  /* Only the Primary. The Secondary's border already carries the button's
+     shape and is owned by the variant — see above. */
+  .button[data-btn][data-btn]:not(
+      [data-wf--button--button-variant='secondary']
+    ):hover {
+    border-color: var(--btn-border-hover);
   }
 
   .button[data-btn][data-btn]:hover [data-btn-icon] > .cc-circle {

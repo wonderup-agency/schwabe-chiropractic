@@ -1,0 +1,70 @@
+/*
+Accordion — the open state
+
+The closed row is fully styled in the Designer: flush to the column, a top
+hairline, a 28px outlined disc with a `+`. The *open* state is not, and can't
+be: MAST's Accordion is a native `<details>`, so the switch is `[open]` on the
+parent and the thing that has to change is a *child*. Webflow's Designer has no
+`[open]` state and can't write a descendant selector, so the three rules below
+are the only part of the accordion that lives in code.
+
+Figma: open = filled olive disc, beige `−`.
+
+Loaded from global.js, so it ships in dist/styles.css on every page.
+*/
+
+/* ── Tokens ──────────────────────────────────────────────────────────
+   Same pattern as button.css: only the arrival values, never a second
+   copy of the resting ones. The bar's thickness is 1.5px rather than 1px
+   because a hairline reads thinner against a filled disc than against a
+   light background. */
+.accordion-component {
+  --acc-dur: 300ms;
+  --acc-ease: cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  --acc-open-bg: var(--_color---brand--olive-green);
+  --acc-open-fg: var(--_color---brand--beige);
+  --acc-bar-width: 12px;
+  --acc-bar-height: 1.5px;
+}
+
+/* The disc fills. `border-color` follows `background-color` so the 1px
+   outline doesn't survive as a lighter ring around the filled circle.
+
+   `transform: none` is deliberate and load-bearing. MAST's own open state
+   rotates `.accordion-icon` 45° to turn its `+` into an `×`; the `−` below
+   is painted as a background on that same box, so without this it would
+   arrive diagonal. The selector carries `details` + `[open]` on purpose —
+   it has to outrank MAST's rule, which is one class lighter. */
+details.accordion-component[open] > .accordion-trigger > .accordion-icon {
+  transform: none;
+  background-color: var(--acc-open-bg);
+  border-color: var(--acc-open-bg);
+  color: var(--acc-open-fg);
+
+  /* The `−`. It's a background gradient and not a pseudo-element because
+     `.accordion-icon` is an `<svg>`, and `::before` / `::after` don't
+     generate boxes on replaced elements. A background does. */
+  background-image: linear-gradient(var(--acc-open-fg), var(--acc-open-fg));
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: var(--acc-bar-width) var(--acc-bar-height);
+
+  transition:
+    background-color var(--acc-dur) var(--acc-ease),
+    border-color var(--acc-dur) var(--acc-ease);
+}
+
+/* The `+` glyph itself. Hidden rather than removed so the svg keeps its
+   intrinsic box and the disc doesn't collapse. */
+details.accordion-component[open] > .accordion-trigger > .accordion-icon path {
+  opacity: 0;
+}
+
+/* A state, not an off switch: the disc still fills and the `−` still
+   appears — it just doesn't fade there. */
+@media (prefers-reduced-motion: reduce) {
+  details.accordion-component[open] > .accordion-trigger > .accordion-icon {
+    transition: none;
+  }
+}

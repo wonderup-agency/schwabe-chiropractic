@@ -7,5 +7,6 @@ regardless of which components are present.
 */
 
 import '../styles/button.css'
+import '../styles/accordion.css'
 
 export default function () {}
