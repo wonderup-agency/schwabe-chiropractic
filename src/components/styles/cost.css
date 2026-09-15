@@ -8,12 +8,15 @@ stylesheet that applies before the first paint, unlike GSAP.
 /* ── Anti-FOUC ───────────────────────────────────────────────────────────
    Only the four lines start hidden. The intro is the section's resting state
    and the outro carries the appointment CTA — critical content is never
-   hidden, it appears. */
-[data-cost-line] {
+   hidden, it appears.
+
+   The hook is on the container because MAST's Plain Text is a ComponentInstance
+   and Webflow rejects attributes on those. */
+[data-cost-lines] > * {
   opacity: 0;
 }
 
-html.anim-failsafe [data-cost-line] {
+html.anim-failsafe [data-cost-lines] > * {
   opacity: 1;
   transform: none;
   filter: none;
@@ -29,7 +32,7 @@ html.anim-failsafe [data-cost-band] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-cost-line] {
+  [data-cost-lines] > * {
     opacity: 1;
     transform: none !important;
     filter: none !important;

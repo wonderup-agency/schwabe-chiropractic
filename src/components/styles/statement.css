@@ -5,23 +5,27 @@ Imported by src/components/statement.js, so it lands in dist/styles.css: a
 blocking stylesheet that applies before the first paint, unlike GSAP.
 */
 
-/* Anti-FOUC. The opacity goes on the CONTAINER, never on the words: the words
-   do not exist until SplitText runs. */
-[data-statement-line] {
+/* Anti-FOUC. The opacity goes on each LINE container, never on the words: the
+   words do not exist until SplitText runs.
+
+   The hook is on the parent because MAST's Heading is a ComponentInstance and
+   Webflow rejects attributes on those, so the lines are addressed as its direct
+   children. */
+[data-statement-lines] > * {
   opacity: 0;
 }
 
 /* Safety net, armed by armFoucFailsafe() in global.js. If GSAP never loads or
    a selector has a typo, this reveals the content after 3s. Elements GSAP did
    bind keep their state — it writes opacity inline, and inline beats a class. */
-html.anim-failsafe [data-statement-line] {
+html.anim-failsafe [data-statement-lines] > * {
   opacity: 1;
   transform: none;
   filter: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-statement-line] {
+  [data-statement-lines] > * {
     opacity: 1;
     transform: none !important;
     filter: none !important;

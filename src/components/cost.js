@@ -77,7 +77,11 @@ export default function (elements) {
       const band = wrapper.querySelector('[data-cost-band]')
       const media = wrapper.querySelector('[data-cost-media]')
       const scrim = wrapper.querySelector('[data-cost-scrim]')
-      const lines = wrapper.querySelectorAll('[data-cost-line]')
+      // MAST's Plain Text is a ComponentInstance and Webflow rejects attributes
+      // on those, so the four lines are addressed as the direct children of
+      // [data-cost-lines] rather than each carrying its own attribute.
+      const linesBox = wrapper.querySelector('[data-cost-lines]')
+      const lines = linesBox ? Array.from(linesBox.children) : []
 
       // Without the stage wrapper there is no curtain: in the published DOM
       // the intro and the band are siblings in normal flow and never overlap,

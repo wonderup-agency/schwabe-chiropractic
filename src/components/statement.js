@@ -64,7 +64,13 @@ export default function (elements) {
     const mm = gsap.matchMedia()
 
     elements.forEach((wrapper) => {
-      const lines = wrapper.querySelectorAll('[data-statement-line]')
+      // MAST's Heading is a ComponentInstance and Webflow rejects attributes
+      // on those ("This element does not support attributes"), so the hook is
+      // one attribute on the container and the lines are its direct children —
+      // the same shape reveal.js uses for data-anim="stagger".
+      const linesBox = wrapper.querySelector('[data-statement-lines]')
+      if (!linesBox) return
+      const lines = Array.from(linesBox.children)
       if (!lines.length) return
 
       // Reduced motion is a state, not an off switch: same end state, no
