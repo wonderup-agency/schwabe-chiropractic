@@ -26,6 +26,26 @@ import {
 const STATEMENT = {
   // Scroll the pin consumes, as a share of the viewport.
   pin: '+=100%',
+  // Where the words start appearing, as a share of the viewport height from
+  // the top. 0.7 means "when the section's top reaches 70% down the screen" —
+  // i.e. while it is still rising, before it reaches the top.
+  //
+  // The reveal is a SEPARATE trigger from the pin on purpose: ScrollTrigger
+  // pins the element wherever it is when the trigger starts, so a single
+  // trigger starting early would freeze the section mid-screen. Two triggers
+  // is the only way to have the reveal begin before the pin does.
+  //
+  // Calibrated by measuring, not guessing: the text sits centred in a 100dvh
+  // section, roughly 450px below its top edge. At 0.7 the trigger fired while
+  // the text was still below the fold, so the first word was fully opaque
+  // with the section 220px short of the top — it read as "already done"
+  // rather than "arriving". 0.35 puts the start right as the text clears the
+  // bottom edge.
+  revealStart: 0.35,
+  // How much of the pin the reveal keeps running for, 0–1. Without this the
+  // words would all be in before the pin even starts, leaving the whole pin
+  // static.
+  revealIntoPin: 0.4,
   // Starting blur on each word, in px.
   blur: 8,
   // Where the second headline starts relative to the first, 0–1 of its own
@@ -118,21 +138,53 @@ export default function (elements) {
             const split = SplitText.create(line, { type: 'words' })
             splits.push(split)
             wordsPerLine.push(split.words)
+            // The container was hidden by the anti-FOUC CSS; the words inside
+            // it were not, because they did not exist when that CSS applied.
+            // So hand the hiding over: container on, words off.
+            //
+            // This set is not redundant with the fromTo below. A fromTo placed
+            // later in a timeline does not render its start values until the
+            // playhead reaches it, so the second headline's words stayed fully
+            // visible until the scroll got to them — measured at opacity 1
+            // through the whole approach.
             gsap.set(line, { opacity: 1 })
+            gsap.set(split.words, {
+              opacity: 0,
+              filter: `blur(${STATEMENT.blur}px)`,
+            })
           })
 
+          // The reveal. Starts while the section is still rising and keeps
+          // running into the first part of the pin, so the visitor never sees
+          // the empty band: by the time the section lands, the words are
+          // already arriving. Created before the pin trigger so the two
+          // refresh in page order.
           const tl = gsap.timeline({
             scrollTrigger: {
               trigger: wrapper,
-              start: 'top top',
-              end: STATEMENT.pin,
-              pin: true,
-              pinSpacing: true,
-              anticipatePin: 1,
+              start: `top ${STATEMENT.revealStart * 100}%`,
+              end: () =>
+                `+=${
+                  window.innerHeight *
+                  (STATEMENT.revealStart + STATEMENT.revealIntoPin)
+                }`,
               scrub: SCROLL.scrub,
               invalidateOnRefresh: true,
               markers: isDev(),
             },
+          })
+
+          // The pin. No animation of its own — it holds the finished sentence
+          // on screen so it cannot be scrolled past.
+          ScrollTrigger.create({
+            trigger: wrapper,
+            start: 'top top',
+            end: STATEMENT.pin,
+            pin: true,
+            pinSpacing: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            markers: isDev(),
           })
 
           // No travel on the scrubbed branch — opacity and blur only.

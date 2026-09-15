@@ -5,7 +5,9 @@ Two jobs:
 
 1. Pull in the site-wide stylesheets so Rollup extracts them into
    dist/styles.css. CSS imported here applies to every page regardless of
-   which components are present.
+   which components are present. theme.css goes first: it pins the whole
+   token palette to light, so everything imported after it resolves against
+   the colours the site was actually designed in.
 
 2. Arm the anti-FOUC failsafe. Components that animate from a hidden state
    ship that hidden state in CSS, because dist/styles.css is a blocking
@@ -17,6 +19,7 @@ Two jobs:
    GSAP writes opacity inline, and inline beats a class rule.
 */
 
+import '../styles/theme.css'
 import '../styles/button.css'
 import '../styles/accordion.css'
 import { armFoucFailsafe } from '../utils/motion.js'

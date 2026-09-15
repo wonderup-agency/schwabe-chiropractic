@@ -46,6 +46,15 @@ const COST = {
   // Photo drift as a share of the band's height. 8% is the ceiling in
   // motion-language.md; the CSS reserves exactly that much overhang.
   parallax: 8,
+  // Direction of that drift.
+  //   false — the photo travels DOWN as you scroll down, against the scroll.
+  //           It lags behind the frame, which reads as depth: the photo sits
+  //           further away than the text on top of it.
+  //   true  — the photo travels UP, with the scroll but faster than the
+  //           frame. It reads as closer, and pushes the band forward instead
+  //           of back.
+  // Neither is wrong; they say different things about where the photo sits.
+  parallaxInvert: true,
   // The fourth line stays. If it leaves, the band ends empty and the visitor
   // watches it that way while the pin releases.
   keepLast: true,
@@ -233,7 +242,12 @@ export default function (elements) {
           // the PHOTO's own yPercent is P / (1 + 2P/100) — with P=8, ±6.9%.
           // Skip the division and the edge shows.
           if (media && COST.parallax) {
-            const p = COST.parallax / (1 + (COST.parallax * 2) / 100)
+            const magnitude = Math.abs(COST.parallax)
+            // The overhang the CSS reserved is symmetrical, so flipping the
+            // direction costs nothing and can never expose an edge.
+            const p =
+              (magnitude / (1 + (magnitude * 2) / 100)) *
+              (COST.parallaxInvert ? -1 : 1)
             tl.fromTo(
               media,
               { yPercent: -p },

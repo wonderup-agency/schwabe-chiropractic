@@ -14,6 +14,10 @@
 
 export default [
   {
+    selector: "[data-component='reveal']",
+    importFn: () => import('./components/reveal.js'),
+  },
+  {
     selector: "[data-component='cost']",
     importFn: () => import('./components/cost.js'),
   },

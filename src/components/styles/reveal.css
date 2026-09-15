@@ -1,0 +1,92 @@
+/*
+reveal — initial states and the failsafe.
+
+dist/styles.css is a blocking stylesheet: it applies before the first paint.
+GSAP arrives several frames later, so anything that animates from a hidden
+state must ship that state here, not only in gsap.set().
+*/
+
+/* ── Anti-FOUC ──────────────────────────────────────────────────────
+   opacity, NEVER transform. A transform written here COMPOSES with the
+   one GSAP writes — measured on cost.js, a translateY(100%) in CSS plus a
+   yPercent: 100 from GSAP left the element at
+   `translate(0%, 100%) translate(0px, 900px)`: twice the distance, off
+   screen, section blank. gsap.set() owns the initial position; this only
+   prevents the flash.
+
+   `parallax` is deliberately absent — it starts visible by definition, and
+   hiding it would blank a whole background photograph until GSAP loads. */
+[data-anim='mask'],
+[data-anim='words'] {
+  opacity: 0;
+}
+
+/* ── The parallax slack ─────────────────────────────────────────────
+   THE rule of parallax, and the one everybody gets wrong. An image exactly
+   as tall as its container leaves an empty strip at the far edge as soon as
+   it moves. The slack has to exist before the drift does.
+
+   The attribute is REPEATED on purpose and it is not defensive. MAST paints
+   media with `.u-img-cover { position: absolute; inset: 0% }`, which is
+   (0,1,0) — the same specificity as a single `[data-anim='parallax']`. They
+   tie, and a tie is broken by load order, which we do not control: our
+   bundle and Webflow's stylesheet can land in either order. Measured with
+   the single attribute: MAST's `inset: 0` won, the image/container height
+   ratio came back 1.000 and seams of 38px and 46px appeared. Repeated it is
+   (0,2,0) and wins either way. Same trick as button.css.
+
+   10% and not 8% is deliberate too. The drift ceiling is ±8% of the
+   container, so a 8% slack makes the sums land exactly flush — measured at
+   0.0px of margin, with nothing left for subpixel rounding. 10% leaves ~2%.
+
+   If this number changes, REVEAL.slack in reveal.js changes with it: the
+   drift maths divides by it. */
+[data-anim='parallax'][data-anim='parallax'] {
+  top: -10%;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  height: 120%;
+}
+
+/* ── The failsafe ───────────────────────────────────────────────────
+   If GSAP never loads, or a selector typo means an element is never bound,
+   armFoucFailsafe() stamps this class on <html> after 3s and the content
+   appears anyway. GSAP writes opacity and transform inline on everything it
+   binds, and inline beats a class rule, so elements that ARE animating keep
+   their state and only the orphans are revealed.
+
+   `clip-path` is new here relative to statement.css and cost.css: the mask's
+   fallback branch needs it. So is the descendant rule — the mask moves the
+   element's CHILDREN, so clearing only the element itself would leave a
+   photograph parked one full height below its window. */
+html.anim-failsafe [data-anim] {
+  opacity: 1;
+  transform: none;
+  clip-path: none;
+}
+
+html.anim-failsafe [data-anim='mask'] * {
+  transform: none;
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────
+   A state, not an off switch: same end state, nothing moves. The parallax
+   slack is removed too, so the image sits flush instead of hanging 10% off
+   the top of a container that will never scroll it back. */
+@media (prefers-reduced-motion: reduce) {
+  [data-anim='mask'],
+  [data-anim='words'] {
+    opacity: 1;
+  }
+
+  [data-anim] {
+    transform: none !important;
+    clip-path: none !important;
+  }
+
+  [data-anim='parallax'][data-anim='parallax'] {
+    top: 0;
+    height: 100%;
+  }
+}

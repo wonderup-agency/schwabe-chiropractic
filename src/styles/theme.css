@@ -1,0 +1,42 @@
+/*
+theme — el sitio se fuerza a light
+
+El sitio no tiene diseño dark: cada section pinta su fondo con un hex literal
+y sólo los tokens semánticos de MAST cambian. En un teléfono con el sistema en
+dark eso dejaba el nav verde (Brand/Ink) sobre una página beige.
+
+El interruptor NO es `light-dark()` —el CSS publicado tiene cero ocurrencias— y
+tampoco es el bloque `@media (prefers-color-scheme: dark)` del embed de theme
+de MAST: ahí las declaraciones están sueltas al top level de un stylesheet, o
+sea CSS inválido que el browser descarta. Medido el 2026-09-15.
+
+El interruptor real es `theme-toggle.min.js` (MAST, @latest, en el head): lee
+`prefers-color-scheme` y le estampa `u-mode-dark` a <html>. Y como
+`--primary--background` y sus hermanos están declarados en `:root`, la
+sustitución de var() ocurre ahí — el valor ya resuelto se hereda a todo el
+documento, y por eso no alcanza con redeclarar el interruptor en `body`.
+
+Las dos custom properties de abajo son el polyfill de LightningCSS que emite
+Webflow. Sólo una de las dos produce valor: la que vale `initial` queda
+guaranteed-invalid y cae al fallback, la vacía no aporta nada. Fijándolas en
+estado light, `var(--lightningcss-light, <claro>) var(--lightningcss-dark,
+<oscuro>)` resuelve siempre al claro.
+
+`:root:root` es (0,2,0) a propósito, contra el (0,1,0) de `.u-mode-dark`. Con
+un `:root` pelado sería un empate que decide el orden de carga de los
+stylesheets — y ese orden no lo controlamos. Misma lección que
+`[data-cost-lines]`. No lo "simplifiques" a un selector solo.
+
+`color-scheme` va acá por consistencia (scrollbars y controles nativos), no
+como fix: se probó con !important y el token seguía en Brand/Ink. El polyfill
+no lo mira.
+
+No rompe `.u-mode-dark` / `.u-mode-light` aplicadas a mano a una section: esas
+declaran el interruptor en el propio elemento, más abajo en el árbol.
+*/
+
+:root:root {
+  --lightningcss-light: initial;
+  --lightningcss-dark: ;
+  color-scheme: light;
+}

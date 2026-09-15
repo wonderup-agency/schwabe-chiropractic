@@ -9,8 +9,8 @@ exactamente como su CSS estático. Si GSAP no carga, nada cambia.
 
 /* La superficie sólida. Es un layer aparte y no el background de .nav para
    poder animarla con `opacity` —compositor puro— sin hardcodear un color:
-   el token real es un light-dark(), así que animar `background-color`
-   rompería el theme. */
+   el token real es un var() del polyfill de theme de MAST, así que animar
+   `background-color` rompería el theme. */
 [data-nav-bg] {
   position: absolute;
   inset: 0;
