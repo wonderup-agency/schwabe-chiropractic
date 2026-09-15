@@ -135,20 +135,31 @@ export default function (elements) {
             },
           })
 
+          // No travel on the scrubbed branch — opacity and blur only.
+          //
+          // A scrubbed tween has no duration of its own: its progress is the
+          // visitor's scroll. DIST.sm is 12px, and spread over the ~360px of
+          // scroll one word occupies that is 0.03px per pixel scrolled — far
+          // too slow to read as movement, and plenty to read as the text
+          // never settling. Measured: it drifted upward the whole way down.
+          //
+          // `linear` alone only made the drift uniform, it did not remove it.
+          // Travel belongs to tweens that own their duration; the no-pin
+          // branch above still uses it. Here blur carries the gesture — it
+          // has no position for the eye to anchor to, so it reads as coming
+          // into focus rather than as layout moving.
           wordsPerLine.forEach((words, i) => {
             tl.fromTo(
               words,
               {
                 opacity: 0,
-                y: DIST.sm,
                 filter: `blur(${STATEMENT.blur}px)`,
               },
               {
                 opacity: 1,
-                y: 0,
                 filter: 'blur(0px)',
                 duration: DUR.base,
-                ease: EASE.out,
+                ease: EASE.linear,
                 stagger: STAGGER.tight,
               },
               i === 0 ? 0 : `<${STATEMENT.overlap * 100}%`

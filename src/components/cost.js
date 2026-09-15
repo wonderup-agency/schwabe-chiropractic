@@ -190,18 +190,23 @@ export default function (elements) {
           tl.addLabel('curtainClosed', curtainDur)
 
           // ── Beat 2: the lines, one at a time ───────────────────────────
+          // Opacity and blur only, no travel, and linear. A scrubbed tween has
+          // no duration of its own — its progress is the visitor's scroll — so
+          // travel spread across hundreds of pixels reads as the text drifting
+          // rather than entering. See statement.js for the measurements. The
+          // stacked layout plus the blur is what distinguishes one line
+          // replacing another; it does not need direction.
           lines.forEach((line, i) => {
             const isLast = i === lines.length - 1
 
             tl.fromTo(
               line,
-              { opacity: 0, y: DIST.sm, filter: blurIn },
+              { opacity: 0, filter: blurIn },
               {
                 opacity: 1,
-                y: 0,
                 filter: 'blur(0px)',
                 duration: DUR.base,
-                ease: EASE.out,
+                ease: EASE.linear,
               },
               i === 0 ? 'curtainClosed' : `>-=${COST.overlap}`
             )
@@ -211,10 +216,9 @@ export default function (elements) {
             if (!isLast || !COST.keepLast) {
               tl.to(line, {
                 opacity: 0,
-                y: -DIST.sm,
                 filter: blurIn,
                 duration: DUR.base,
-                ease: EASE.in,
+                ease: EASE.linear,
               })
             }
           })

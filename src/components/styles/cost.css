@@ -111,14 +111,20 @@ html.anim-failsafe [data-cost-band] {
   }
 
   /* The four lines share one cell: one at a time, always at the band's optical
-     centre. Left in flow, each would appear at a different height. */
-  [data-cost-lines] {
+     centre. Left in flow, each appears at a different height.
+
+     [data-cost-stage] is in the selector for specificity, not for scoping:
+     MAST's .cost_band-lines is (0,1,0) and a bare [data-cost-lines] is (0,1,0)
+     too, so they TIE and the winner is decided by stylesheet order — which we
+     do not control. Measured with the tie in place, the four lines sat at
+     285/378/470/562 instead of stacking. (0,2,0) settles it. */
+  [data-cost-stage] [data-cost-lines] {
     display: grid;
     grid-template-areas: 'line';
     row-gap: 0;
   }
 
-  [data-cost-lines] > * {
+  [data-cost-stage] [data-cost-lines] > * {
     grid-area: line;
   }
 }
