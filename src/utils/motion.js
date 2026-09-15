@@ -226,3 +226,31 @@ export function onceLaidOut(fn) {
     window.addEventListener('load', run, { once: true })
   }
 }
+
+/**
+ * A `refreshPriority` for a ScrollTrigger, derived from where the element sits
+ * in the document.
+ *
+ * GSAP's docs: "A ScrollTrigger with refreshPriority: 1 will get refreshed
+ * earlier than one with refreshPriority: 0" — HIGHER refreshes SOONER. The
+ * element highest on the page must refresh first, so the document position is
+ * negated. (The bundled /gsap-scrolltrigger skill states this backwards, which
+ * cost a whole debugging cycle on 2026-09-15: with the sign flipped the fix
+ * made the bug worse. Trust gsap.com, not the skill summary.)
+ *
+ * This is NOT optional for any trigger that pins, or that sits below one.
+ * From the same docs: "pinning distance gets added to the start/end values of
+ * subsequent ScrollTriggers further down the page (that's why order matters)".
+ * main.js loads components with parallel dynamic import()s and each waits on
+ * document.fonts.ready separately, so creation order is a lottery — measured on
+ * the live site, `cost` was built before `statement` in 4 of 5 loads, never got
+ * the 900px of `statement`'s pin added to its start, and pinned itself over the
+ * CTA banner 900px too early.
+ *
+ * Pass the same element you pass as `trigger`.
+ *
+ * @param {HTMLElement} el
+ */
+export function refreshOrder(el) {
+  return -Math.round(el.getBoundingClientRect().top + window.scrollY)
+}

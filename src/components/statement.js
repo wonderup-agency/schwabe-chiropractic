@@ -20,6 +20,7 @@ import {
   getGsap,
   getPlugin,
   onceLaidOut,
+  refreshOrder,
   isDev,
 } from '../utils/motion.js'
 
@@ -170,6 +171,7 @@ export default function (elements) {
                 }`,
               scrub: SCROLL.scrub,
               invalidateOnRefresh: true,
+              refreshPriority: refreshOrder(wrapper),
               markers: isDev(),
             },
           })
@@ -182,8 +184,8 @@ export default function (elements) {
             end: STATEMENT.pin,
             pin: true,
             pinSpacing: true,
-            anticipatePin: 1,
             invalidateOnRefresh: true,
+            refreshPriority: refreshOrder(wrapper),
             markers: isDev(),
           })
 
