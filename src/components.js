@@ -14,6 +14,14 @@
 
 export default [
   {
+    selector: "[data-component='cost']",
+    importFn: () => import('./components/cost.js'),
+  },
+  {
+    selector: "[data-component='statement']",
+    importFn: () => import('./components/statement.js'),
+  },
+  {
     selector: "[data-component='nav']",
     importFn: () => import('./components/nav.js'),
   },

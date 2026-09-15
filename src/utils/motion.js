@@ -184,3 +184,45 @@ export function whenLaidOut(fn) {
     window.addEventListener('load', run, { once: true })
   }
 }
+
+/**
+ * Runs fn exactly ONCE, after webfonts are ready.
+ *
+ * This is the helper to use when BUILDING an animation. `whenLaidOut()` above
+ * deliberately runs its callback twice — fonts.ready and window.load — which is
+ * right for a refresh and destructive for anything that constructs: measured
+ * with CDP on 2026-09-14, using it to create a SplitText + pin left TWO
+ * ScrollTriggers pinning the same section.
+ *
+ * It still waits for the font, because SplitText and pinned sections measure the
+ * DOM and a font swapping in afterwards puts every trigger in the wrong place.
+ * Late layout shifts are handled by refreshing, not by rebuilding.
+ *
+ * Note it resolves OUTSIDE any gsap.matchMedia() context, so open the matchMedia
+ * inside the callback — never the other way round. Anything created inside a
+ * .then() that sits within a matchMedia handler escapes that context, and
+ * mm.revert() will not revert it.
+ *
+ * @param {() => void} fn
+ */
+export function onceLaidOut(fn) {
+  let done = false
+  const run = () => {
+    if (done) return
+    done = true
+    fn()
+  }
+
+  const fonts =
+    document.fonts && document.fonts.ready
+      ? document.fonts.ready
+      : Promise.resolve()
+  fonts.then(run)
+
+  // If the font promise never settles, load unblocks it anyway.
+  if (document.readyState === 'complete') {
+    window.setTimeout(run, 0)
+  } else {
+    window.addEventListener('load', run, { once: true })
+  }
+}

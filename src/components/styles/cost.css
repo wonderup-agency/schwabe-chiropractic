@@ -1,0 +1,121 @@
+/*
+cost — initial state + the stage layout the curtain needs.
+
+Imported by src/components/cost.js, so it lands in dist/styles.css: a blocking
+stylesheet that applies before the first paint, unlike GSAP.
+*/
+
+/* ── Anti-FOUC ───────────────────────────────────────────────────────────
+   Only the four lines start hidden. The intro is the section's resting state
+   and the outro carries the appointment CTA — critical content is never
+   hidden, it appears. */
+[data-cost-line] {
+  opacity: 0;
+}
+
+html.anim-failsafe [data-cost-line] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* The band starts invisible, not offset. The difference is not cosmetic: a
+   `transform: translateY(100%)` in CSS COMPOSES with the yPercent GSAP writes.
+   Measured — the band ended up at `translate(0%, 100%) translate(0px, 900px)`,
+   twice the distance and off screen, with the section blank. The curtain's
+   starting position is set by gsap.set(); CSS only keeps it from flashing. */
+html.anim-failsafe [data-cost-band] {
+  opacity: 1 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-cost-line] {
+    opacity: 1;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* ── The curtain's stage ─────────────────────────────────────────────────
+   [data-cost-stage] wraps .cost_intro + .cost_band and measures exactly one
+   viewport. The two children stack in the same grid cell, which is what lets
+   the band cover the intro — in Webflow's DOM they are siblings in normal flow
+   and never overlap, so no tween alone could do it.
+
+   Three reasons the pin goes here and not on the section:
+   1. The section measures stage + outro. Pinning it would leave a dead
+      viewport between the end of the pin and the outro.
+   2. The overflow: hidden that hides the band while it waits below would clip
+      the outro too.
+   3. 100dvh, not 100vh: iOS changes vh as the address bar moves.
+
+   All of it scoped to no-preference: with reduced motion the three blocks read
+   stacked in normal flow, no pin. */
+@media (min-width: 768px) and (min-height: 600px) and (prefers-reduced-motion: no-preference) {
+  [data-cost-stage] {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 100dvh;
+    overflow: hidden;
+    --cost-scrim-max: 0.45;
+  }
+
+  [data-cost-stage] > * {
+    grid-area: 1 / 1;
+  }
+
+  [data-cost-stage] .cost_intro {
+    align-self: center;
+    padding-block: 0;
+  }
+
+  [data-cost-stage] .cost_band {
+    min-height: 100dvh;
+    /* Invisible until GSAP places it. No transform here — see the anti-FOUC
+       block above. */
+    opacity: 0;
+  }
+
+  /* Overhang top and bottom so the parallax never shows the edge. The 8% is
+     the ceiling motion-language.md sets.
+
+     The selector is long out of necessity, not taste: MAST ships
+     .img-component.cc-media-abs { inset: 0; height: 100% } at (0,2,0). A bare
+     [data-cost-media] is (0,1,0) and LOSES — measured, the photo stayed at
+     ratio 1.000 instead of 1.160 and the parallax left a 62px empty strip.
+     [data-cost-stage] plus the repeated attribute gives (0,3,0). */
+  [data-cost-stage] [data-cost-media][data-cost-media] {
+    inset: auto 0 auto 0;
+    top: -8%;
+    height: 116%;
+    object-fit: cover;
+  }
+
+  /* MAST's scrim is rgba(0,0,0,.2). Measured over this photo with the text
+     hidden, the background behind the lines gives 4.04:1 average contrast
+     against Tone Strong (#f7f6f5) but 2.74:1 at the 95th percentile — so the
+     brightest snow misses the 3.0:1 WCAG AA asks for text 24px and up. These
+     lines are 47px.
+
+     At --cost-scrim-max: 0.45 the same spot reads 7.16:1 average and 5.24:1
+     at p95. The colour sits at the maximum and the animation modulates it with
+     opacity, which is compositor-only, unlike animating background-color. At
+     rest 0.444 × 0.45 ≈ MAST's original value. */
+  [data-cost-stage] [data-cost-scrim] {
+    background-color: rgb(0 0 0 / var(--cost-scrim-max));
+    opacity: 0.444;
+  }
+
+  /* The four lines share one cell: one at a time, always at the band's optical
+     centre. Left in flow, each would appear at a different height. */
+  [data-cost-lines] {
+    display: grid;
+    grid-template-areas: 'line';
+    row-gap: 0;
+  }
+
+  [data-cost-lines] > * {
+    grid-area: line;
+  }
+}

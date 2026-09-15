@@ -1,0 +1,40 @@
+/*
+statement — initial state + the layout the pinned branch needs.
+
+Imported by src/components/statement.js, so it lands in dist/styles.css: a
+blocking stylesheet that applies before the first paint, unlike GSAP.
+*/
+
+/* Anti-FOUC. The opacity goes on the CONTAINER, never on the words: the words
+   do not exist until SplitText runs. */
+[data-statement-line] {
+  opacity: 0;
+}
+
+/* Safety net, armed by armFoucFailsafe() in global.js. If GSAP never loads or
+   a selector has a typo, this reveals the content after 3s. Elements GSAP did
+   bind keep their state — it writes opacity inline, and inline beats a class. */
+html.anim-failsafe [data-statement-line] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-statement-line] {
+    opacity: 1;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* The section only pins above 768 AND with real height to spare. The second
+   term is not paranoia: a phone on its side (844×390) lands in Webflow's
+   Tablet breakpoint and would pass a bare min-width. See RESPONSIVE.md */
+@media (min-width: 768px) and (min-height: 600px) and (prefers-reduced-motion: no-preference) {
+  .section.cc-statement {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+  }
+}
