@@ -184,3 +184,58 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
    is the card's static state, and if this stylesheet never loaded the
    cards would still read correctly — they would simply have no rule and
    never invert. */
+
+/* ── The marquee's edge fade ────────────────────────────────────────────
+   MAST's marquee masks its own edges:
+
+     mask-image: linear-gradient(to right,
+       transparent 0%, #000 10%, #000 90%, transparent 100%)
+
+   At the section's 1425px that 10% is 142px, and a card is 332px — the fade
+   eats 43% of a card. While every card was beige that was invisible, because
+   they faded into a beige section. The moment the hover turns one of them
+   forest green it reads as the card dissolving, and since the marquee PAUSES
+   on hover, a card stopped in that zone stays half-dissolved. Reported with
+   a screenshot of exactly that.
+
+   Two changes, and they solve different halves of it:
+
+   1. The fade drops to 4% (~57px). Narrow enough that a hovered card is
+      almost never inside it, wide enough that the marquee still reads as
+      running off the edge rather than being cut.
+
+   2. While a card is hovered the mask comes off entirely. `:has()` is what
+      makes that expressible in CSS. It pairs with the pause: the marquee has
+      already stopped, so nothing is moving when the edges resolve, and you
+      get to read the whole card you pointed at.
+
+   Scoped to `.cc-symptoms` so other marquees keep MAST's default, and the
+   class is doubled for specificity — MAST's rule comes from an HtmlEmbed
+   whose load order relative to dist/styles.css we do not control. Both the
+   prefixed and unprefixed properties are set: Safari still needs the
+   prefix. */
+.marquee-component.cc-symptoms.cc-symptoms {
+  --marquee-fade: 4%;
+
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 var(--marquee-fade),
+    #000 calc(100% - var(--marquee-fade)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 var(--marquee-fade),
+    #000 calc(100% - var(--marquee-fade)),
+    transparent 100%
+  );
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .marquee-component.cc-symptoms.cc-symptoms:has([data-symptom-card]:hover) {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}

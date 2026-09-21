@@ -1,0 +1,92 @@
+/*
+plan — initial states, the collapse, and the failsafe.
+
+dist/styles.css is a blocking stylesheet, so it applies before the first
+paint; GSAP arrives several frames later. Anything the component starts from
+has to be here, not only in gsap.set().
+*/
+
+/* The clip that makes a collapsed step disappear. It is also declared on
+   `.plan-step_detail` in the Designer; restated here so the behaviour
+   survives a class rename, which is a naming change and not an animation
+   change. */
+[data-plan-detail] {
+  overflow: hidden;
+}
+
+/* ── Anti-FOUC ──────────────────────────────────────────────────────
+   opacity, never transform: a transform written here COMPOSES with the one
+   GSAP writes. `height` is safe — it does not compose, it is overridden. */
+[data-plan-step] {
+  opacity: 0;
+}
+
+/* ── The collapse ───────────────────────────────────────────────────
+   Scoped to exactly the viewports that get the pinned accordion, and that
+   scope is the accessibility argument for the whole feature: below 992px, or
+   on a short viewport, or with reduced motion, the three steps are simply
+   open and there is no window in which two thirds of the copy is hidden.
+   Most visits to a local clinic come from a phone, and a phone never sees
+   this rule.
+
+   No opacity here on purpose. `height: 0` plus the clip above already hides
+   the step; leaving opacity alone means the copy stays in the accessibility
+   tree and a screen reader still reads all three. */
+@media (min-width: 992px) and (min-height: 600px) and (prefers-reduced-motion: no-preference) {
+  [data-plan-detail] {
+    height: 0;
+  }
+
+  [data-plan-step]:first-child [data-plan-detail] {
+    height: auto;
+  }
+}
+
+/* ── The failsafe ───────────────────────────────────────────────────
+   armFoucFailsafe() stamps this class on <html> after 3s. Here it has to do
+   more than reveal: a collapsed step is hidden by HEIGHT, so unhiding it
+   means opening it. Without this, a GSAP that never loads leaves two thirds
+   of the section's copy clipped to nothing forever.
+
+   No !important needed. `html.anim-failsafe [data-plan-detail]` is (0,2,1)
+   against the (0,1,0) of the collapse rule above, and GSAP writes height and
+   opacity inline on everything it binds, so steps that ARE animating keep
+   their state and only the orphans are opened. */
+html.anim-failsafe [data-plan-step] {
+  opacity: 1;
+  transform: none;
+}
+
+html.anim-failsafe [data-plan-detail] {
+  height: auto;
+  opacity: 1;
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────
+   A state, not an off switch: the end state of the whole sequence is all
+   three steps open, so that is what it gets. */
+@media (prefers-reduced-motion: reduce) {
+  [data-plan-step] {
+    opacity: 1;
+  }
+
+  [data-plan-detail] {
+    height: auto;
+  }
+}
+
+/* ── The click affordance ───────────────────────────────────────────
+   Scoped to exactly the branch that wires the handlers. Below 992px, on a
+   short viewport, or with reduced motion the steps are already open and
+   `plan.js` attaches nothing — so a pointer cursor there would promise an
+   interaction that does not exist. */
+@media (min-width: 992px) and (min-height: 600px) and (prefers-reduced-motion: no-preference) {
+  [data-plan-step][role='button'] {
+    cursor: pointer;
+  }
+
+  [data-plan-step][role='button']:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
+}

@@ -14,6 +14,10 @@
 
 export default [
   {
+    selector: "[data-component='plan']",
+    importFn: () => import('./components/plan.js'),
+  },
+  {
     selector: "[data-component='toc']",
     importFn: () => import('./components/toc.js'),
   },

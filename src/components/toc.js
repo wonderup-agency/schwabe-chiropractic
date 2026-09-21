@@ -6,7 +6,7 @@ The article's "In this article" index. Answers Derek's comment on the Blog Post
 template — *"will this be 'sticky'? and what is active vs. non-active state for
 Table of Content sections?"*
 
-Sticky is CSS (.article_toc is position: sticky). This file does the two things
+Sticky is CSS (.toc is position: sticky). This file does the two things
 CSS cannot: build the list from the article's own H2s, and track which section
 the reader is in.
 */
@@ -14,7 +14,7 @@ the reader is in.
 import './styles/toc.css'
 
 const ACTIVE = 'cc-active'
-const LINK_CLASS = 'article_toc-link'
+const LINK_CLASS = 'toc_link'
 
 /** Turns a heading's text into a stable id. */
 function slugify(text, used) {

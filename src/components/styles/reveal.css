@@ -17,7 +17,21 @@ state must ship that state here, not only in gsap.set().
    `parallax` is deliberately absent — it starts visible by definition, and
    hiding it would blank a whole background photograph until GSAP loads. */
 [data-anim='mask'],
-[data-anim='words'] {
+[data-anim='words'],
+[data-anim='rule'] {
+  opacity: 0;
+}
+
+/* `stagger` hides its CHILDREN, not itself — the hook is a layout wrapper
+   that usually carries the section's own background and must stay visible.
+
+   `:not([data-anim])` is load-bearing. `.four_row` has FIVE direct children,
+   not four: the hairline `.four_rule` is a sibling of the four `.four_item`s
+   and carries its own `data-anim="rule"`. The JS skips it for the same
+   reason, so hiding it here under two different rules would be harmless but
+   confusing — and for a child variant that must NOT start hidden (a
+   parallax), it would be a bug. */
+[data-anim='stagger'] > *:not([data-anim]) {
   opacity: 0;
 }
 
@@ -49,6 +63,30 @@ state must ship that state here, not only in gsap.set().
   height: 120%;
 }
 
+/* Same slack, one level down: `parallax-media` hooks the CLIPPING CONTAINER
+   and the <img> inside it is what drifts, because MAST's `Image` is a
+   ComponentInstance and Webflow refuses attributes on those.
+
+   The doubled attribute is doing the same job as above and then some: the
+   descendant `img` here is usually MAST's `.u-img-cover`, which declares
+   `position: absolute; inset: 0`. A single attribute plus `img` would be
+   (0,1,1) against that (0,1,0) and would win — but only on `top`; the
+   repeated attribute keeps the whole rule out of reach of any future MAST
+   class on the same element.
+
+   `position: absolute` is restated on purpose. Without it `top` and a
+   percentage `height` have nothing to resolve against, and the drift would
+   silently do nothing on a static-flow image — which is exactly what
+   `.media-band_img` was before the frame was added to Photo Band. */
+[data-anim='parallax-media'][data-anim='parallax-media'] img {
+  position: absolute;
+  top: -10%;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  height: 120%;
+}
+
 /* ── The failsafe ───────────────────────────────────────────────────
    If GSAP never loads, or a selector typo means an element is never bound,
    armFoucFailsafe() stamps this class on <html> after 3s and the content
@@ -70,13 +108,23 @@ html.anim-failsafe [data-anim='mask'] * {
   transform: none;
 }
 
+/* Same blind spot as above: the children are what's hidden, so the failsafe
+   has to name them. Without this, a GSAP that never loads leaves the four
+   numbered items of every Four Things on the site invisible forever. */
+html.anim-failsafe [data-anim='stagger'] > * {
+  opacity: 1;
+  transform: none;
+}
+
 /* ── Reduced motion ─────────────────────────────────────────────────
    A state, not an off switch: same end state, nothing moves. The parallax
    slack is removed too, so the image sits flush instead of hanging 10% off
    the top of a container that will never scroll it back. */
 @media (prefers-reduced-motion: reduce) {
   [data-anim='mask'],
-  [data-anim='words'] {
+  [data-anim='words'],
+  [data-anim='rule'],
+  [data-anim='stagger'] > * {
     opacity: 1;
   }
 
@@ -86,6 +134,11 @@ html.anim-failsafe [data-anim='mask'] * {
   }
 
   [data-anim='parallax'][data-anim='parallax'] {
+    top: 0;
+    height: 100%;
+  }
+
+  [data-anim='parallax-media'][data-anim='parallax-media'] img {
     top: 0;
     height: 100%;
   }

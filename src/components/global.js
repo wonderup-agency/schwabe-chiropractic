@@ -24,6 +24,7 @@ import '../styles/button.css'
 import '../styles/accordion.css'
 import '../styles/area-card.css'
 import '../styles/symptom-card.css'
+import '../styles/job-card.css'
 import { armFoucFailsafe } from '../utils/motion.js'
 
 export default function () {

@@ -2,7 +2,7 @@
 Table of contents — what the Designer cannot express.
 
 The sticky offset, the link's resting look and its .cc-active state all live in
-Webflow (.article_toc, .article_toc-link, .article_toc-link.cc-active). What is
+Webflow (.toc, .toc_link, .toc_link.cc-active). What is
 here is the scroll behaviour the links depend on and the focus ring.
 
 No anti-FOUC: the aside is empty until the JS fills it, so before that there is

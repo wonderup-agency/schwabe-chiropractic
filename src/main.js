@@ -36,12 +36,21 @@ function getCurrentBreakpoint() {
 let currentBreakpoint = getCurrentBreakpoint()
 
 const activeComponents = []
+// Registered components whose selector matched nothing on this page. Reported
+// once at the end of init, because "my animation does nothing" is almost
+// always this and the silent return gave no way to tell it apart from a
+// component that loaded and then failed. Terser strips console.* in the prod
+// build, so this costs nothing to ship.
+const skippedComponents = []
 
 async function loadComponent({ selector, importFn }) {
   const componentName = getComponentName(selector)
   try {
     const elements = document.querySelectorAll(selector)
-    if (elements.length === 0) return
+    if (elements.length === 0) {
+      skippedComponents.push(`${componentName} (${selector})`)
+      return
+    }
     const module = await importFn()
 
     if (typeof module.default === 'function') {
@@ -114,6 +123,13 @@ function init() {
       )
     }
     await Promise.all(components.map(loadComponent))
+
+    if (skippedComponents.length) {
+      console.log(
+        `%c💤 [main.js] Not on this page (${skippedComponents.length}): ${skippedComponents.join(', ')}`,
+        'color: #94a3b8'
+      )
+    }
   })()
 }
 

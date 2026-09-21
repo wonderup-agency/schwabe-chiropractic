@@ -114,7 +114,7 @@ html.anim-failsafe [data-cost-band] {
      centre. Left in flow, each appears at a different height.
 
      [data-cost-stage] is in the selector for specificity, not for scoping:
-     MAST's .cost_band-lines is (0,1,0) and a bare [data-cost-lines] is (0,1,0)
+     MAST's .cost-band_lines is (0,1,0) and a bare [data-cost-lines] is (0,1,0)
      too, so they TIE and the winner is decided by stylesheet order — which we
      do not control. Measured with the tie in place, the four lines sat at
      285/378/470/562 instead of stacking. (0,2,0) settles it. */

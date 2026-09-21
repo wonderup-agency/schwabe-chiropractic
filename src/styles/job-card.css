@@ -1,0 +1,71 @@
+/*
+Job opening card — the open state and the native-disclosure cleanup
+
+The card on /join-our-team is a native `<details>`, not MAST's Accordion.
+That's deliberate: the Figma keeps the role title AND its summary visible
+while the card is collapsed, and MAST's Accordion only exposes `Text` for the
+trigger — the summary would have to go in the slot, where it hides. A native
+`<details>` lets the `<summary>` hold both, works with zero JavaScript, and is
+keyboard- and screen-reader-accessible by default.
+
+What the Designer can style: the resting card, the two requirement columns,
+the apply strip, and the `+` drawn as two pseudo-element bars on
+`.job-card_icon`.
+
+What it can't, and therefore lives here:
+
+1. `[open]` — same limitation as accordion.css. The switch is on the parent
+   and the thing that changes is a child.
+2. The default disclosure triangle. `list-style: none` alone does not remove
+   it in Safari; that needs `::-webkit-details-marker`.
+
+Loaded from global.js, so it ships in dist/styles.css on every page.
+*/
+
+.job-card {
+  --job-dur: 300ms;
+  --job-ease: cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  --job-open-bg: var(--_color---brand--olive-green);
+  --job-open-fg: var(--_color---brand--beige);
+}
+
+/* Safari still paints its own triangle when the summary is `display: flex`
+   and `list-style: none`. This is the only thing that removes it. */
+.job-card_summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Open: the disc fills and the `+` loses its vertical stroke, becoming a `−`.
+   `border-color` follows the fill so the 1px outline doesn't survive as a
+   lighter ring around the filled circle. */
+details.job-card[open] > .job-card_summary > .job-card_icon {
+  background-color: var(--job-open-bg);
+  border-color: var(--job-open-bg);
+  color: var(--job-open-fg);
+
+  transition:
+    background-color var(--job-dur) var(--job-ease),
+    border-color var(--job-dur) var(--job-ease);
+}
+
+details.job-card[open] > .job-card_summary > .job-card_icon::after {
+  opacity: 0;
+}
+
+/* A state, not an off switch: the disc still fills and the bar still
+   disappears — it just doesn't fade there. */
+@media (prefers-reduced-motion: reduce) {
+  details.job-card[open] > .job-card_summary > .job-card_icon,
+  .job-card_icon::after {
+    transition: none;
+  }
+}
+
+/* The whole summary is the hit area, so it needs a focus ring of its own —
+   `:focus-visible` on the summary, not on the icon, or keyboard users get a
+   ring around a 32px circle instead of the row they are actually on. */
+.job-card_summary:focus-visible {
+  outline: 2px solid var(--_color---brand--olive-green);
+  outline-offset: -2px;
+}
