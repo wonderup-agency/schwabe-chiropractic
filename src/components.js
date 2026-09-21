@@ -14,6 +14,14 @@
 
 export default [
   {
+    selector: "[data-component='toc']",
+    importFn: () => import('./components/toc.js'),
+  },
+  {
+    selector: "[data-component='filter']",
+    importFn: () => import('./components/filter.js'),
+  },
+  {
     selector: "[data-component='reveal']",
     importFn: () => import('./components/reveal.js'),
   },

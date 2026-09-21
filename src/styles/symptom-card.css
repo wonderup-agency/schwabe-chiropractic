@@ -1,0 +1,125 @@
+/*
+Symptom card — the olive rule and the inverted hover
+
+The six cards in "You've tried to get this sorted. It keeps coming back."
+(`cc-sound-familiar`). Figma frame 974:1594, card component 974:1704.
+
+Two things live here and not in the Designer, for two different reasons.
+
+THE RULE is a `::before`. The Figma draws a 24×2 olive bar above the copy as
+a real div inside the card. Reproducing that literally would mean inserting
+an element into ten cards — the marquee duplicates the five-card track, so
+every structural change is paid twice — for something that carries no
+content and no semantics. A pseudo-element is the same pixels with nothing
+added to the DOM or to the accessibility tree.
+
+THE HOVER has to restyle a CHILD on the parent's hover: the card inverts and
+the Plain Text inside it has to go beige. Webflow doesn't write descendant
+selectors, which is the same limit that put `button.css`, `accordion.css`
+and `area-card.css` in this folder.
+
+Everything else about the card — size, padding, radius, resting background,
+border — is in the Designer on `.symptoms_card`, where it belongs.
+
+Loaded from global.js, so it ships in dist/styles.css on every page.
+*/
+
+[data-symptom-card] {
+  /* MAST's own pair, the same one `button.css` and `area-card.css` use. */
+  --symptom-dur: 300ms;
+  --symptom-ease: cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  /* Arrival values only. The resting ones are whatever `.symptoms_card`
+     has in the Designer — restating them here would be a second copy free
+     to drift. */
+  --symptom-bg-hover: var(--_color---brand--forest-green);
+  --symptom-fg-hover: var(--_color---brand--beige);
+
+  /* The rule. Olive Green is the brand token; see the note at the bottom
+     about the colour the Figma actually used. */
+  --symptom-rule: var(--_color---brand--olive-green);
+  --symptom-rule-w: 24px;
+  --symptom-rule-h: 2px;
+
+  transition:
+    background-color var(--symptom-dur) var(--symptom-ease),
+    color var(--symptom-dur) var(--symptom-ease);
+}
+
+/* ── The rule ───────────────────────────────────────────────────────────
+   The card is a flex column, so the pseudo-element is simply its first
+   flex item and the existing `gap` spaces it from the copy. No absolute
+   positioning, so it can't collide with the text at any width.
+   `flex: none` matters: without it the bar would stretch or shrink with
+   the card instead of staying 24px. */
+[data-symptom-card]::before {
+  content: '';
+  display: block;
+  flex: none;
+  width: var(--symptom-rule-w);
+  height: var(--symptom-rule-h);
+  border-radius: 8px;
+  background-color: var(--symptom-rule);
+}
+
+/* ── The inverted state ─────────────────────────────────────────────────
+   Scoped to real pointers. On touch `:hover` sticks after the tap and the
+   card would stay inverted with no way back — the trap `button.css`
+   documents. There is no `:focus-within` counterpart here, unlike
+   `area-card.css`: that card contains a link, so keyboard focus can land
+   inside it. This one is a plain text card with nothing focusable, so a
+   focus rule would never fire and would only suggest interactivity that
+   isn't there.
+
+   The border does NOT change, and neither does the rule. Both keep their
+   resting colour against the dark fill — that is what the Figma shows
+   (974:1747), and it is what keeps the card's silhouette readable as it
+   inverts. */
+@media (hover: hover) and (pointer: fine) {
+  [data-symptom-card]:hover {
+    background-color: var(--symptom-bg-hover);
+    color: var(--symptom-fg-hover);
+  }
+
+  /* The copy is a MAST `Plain Text` instance. `color` on the card should
+     reach it by inheritance, but MAST's type classes set colour on some
+     variants, and a tie there is decided by stylesheet load order, which
+     this project does not control. The attribute is repeated for
+     specificity (0,2,0) so the descendant rule wins outright — the same
+     trick `button.css` and `area-card.css` use. */
+  [data-symptom-card][data-symptom-card]:hover .plain-text,
+  [data-symptom-card][data-symptom-card]:hover .heading-text {
+    color: var(--symptom-fg-hover);
+  }
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────
+   A state, not an off switch: the card still inverts, it just arrives
+   instantly. */
+@media (prefers-reduced-motion: reduce) {
+  [data-symptom-card] {
+    transition-duration: 0s;
+  }
+}
+
+/* ── Two notes for whoever touches this next ───────────────────────────
+
+   THE FIGMA'S RULE IS OFF-PALETTE. The divider in 974:1704 is #728738,
+   which is not one of the sixteen `--_color---brand--*` tokens; the site's
+   olive is #6b744e. The difference is visible — #728738 is brighter and
+   more yellow. This file uses the TOKEN, on the assumption that the Figma
+   value is a slip rather than a new brand colour. If it is deliberate, it
+   needs to become a real variable in the Color collection first, not a
+   hex pasted here.
+
+   THE CARDS LIVE IN A MARQUEE that pauses on hover (see
+   `components/sound-familiar` in the Designer). So hovering a card both
+   stops the drift and inverts that card. That reads correctly — the thing
+   you pointed at stops and highlights — but it means the hover can never
+   be tested while the track is moving, and any change to the pause
+   behaviour changes how this state feels.
+
+   No anti-FOUC CSS, deliberately: nothing here is hidden. The resting card
+   is the card's static state, and if this stylesheet never loaded the
+   cards would still read correctly — they would simply have no rule and
+   never invert. */

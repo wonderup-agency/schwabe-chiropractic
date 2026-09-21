@@ -1,0 +1,36 @@
+/*
+Filter — the only CSS the component needs.
+
+No anti-FOUC here, and that is deliberate: nothing is hidden before the JS
+runs. Without JS every card stays visible, which for a filtered grid is the
+correct degraded state — the visitor sees all the articles instead of none.
+
+The chip's resting and active styling lives in the Designer (.filter-chip and
+.filter-chip.cc-active). What is here is only what the Designer cannot express.
+*/
+
+/* A hidden card must not keep its grid cell. [hidden] is display:none by UA
+   default, but Webflow's reset sets display on Collection Items, which wins on
+   specificity — so it has to be restated. */
+[data-filter-list] > [hidden] {
+  display: none;
+}
+
+/* The chips are divs with role="button" (a real <button> outside a <form> is
+   purged by Webflow), so they get no focus ring for free. */
+[data-filter]:focus-visible {
+  outline: 2px solid var(--_color---brand--olive-green);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-filter]:hover {
+    border-color: var(--_color---brand--border);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-filter] {
+    transition-duration: 0s;
+  }
+}

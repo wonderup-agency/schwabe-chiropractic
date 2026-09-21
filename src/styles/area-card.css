@@ -1,0 +1,113 @@
+/*
+Area of Care card — the inverted state
+
+The Figma for the Care Hub draws one of the six cards (Back & Neck Pain) on
+Brand/Ink with beige text, and the design never said whether that was a
+hover state or a permanently featured card. Derek asked the question
+directly — "Is the darker background just a 'mouse over' effect? how would
+this work on mobile?" — so it is answered here rather than left ambiguous.
+
+It is a HOVER STATE, not a featured card, for two reasons:
+
+1. A permanently dark card privileges one area of care over the other five
+   for no editorial reason. Nothing in the copy makes Back & Neck Pain the
+   headline area; it is simply the card the mockup happened to demonstrate
+   the state on.
+2. A hover state has a defined answer on touch — there isn't one — whereas
+   a featured card would need a rule for *which* card is featured on every
+   future page that reuses this grid.
+
+So on a real pointer, every card inverts on hover. On touch, no card ever
+inverts and all six render in their resting beige. That is the whole answer
+to "how would this work on mobile": it doesn't run, and nothing is lost,
+because the state carries no information the card doesn't already show.
+
+What Webflow can't do on its own is style a *child* on the parent's hover.
+The title, the body and the button all live inside the card, so these rules
+live here rather than in the Designer — the same reason `button.css` and
+`accordion.css` exist.
+
+Loaded from global.js, so it ships in dist/styles.css on every page.
+*/
+
+[data-area-card] {
+  /* MAST's own duration and curve, the same pair `button.css` uses. The
+     card carries a Button inside it that is already transitioning on these
+     values; matching means the card and the button arrive together instead
+     of the button finishing first. */
+  --area-dur: 300ms;
+  --area-ease: cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  /* Only the arrival values. The resting ones are whatever the Designer
+     has on `.area-card`; restating them here would be a second copy free
+     to drift out of sync with the class. */
+  --area-bg-hover: var(--_color---brand--ink);
+  --area-fg-hover: var(--_color---brand--beige);
+  --area-border-hover: var(--_color---brand--ink);
+
+  transition:
+    background-color var(--area-dur) var(--area-ease),
+    border-color var(--area-dur) var(--area-ease),
+    color var(--area-dur) var(--area-ease);
+}
+
+/* The dome keeps its beige-muted fill in both states on purpose. It is the
+   one element that has to stay light: the icons are single-colour line art
+   with no dark-background variant, and inverting the dome would leave them
+   invisible. Against the ink card the dome reads as a lit window, which is
+   also what the Figma shows. */
+
+/* ── The inverted state ─────────────────────────────────────────────────
+   Scoped to real pointers. On touch `:hover` sticks after the tap and the
+   card would stay inverted with no way back — the same trap `button.css`
+   documents. `:focus-within` is not inside the media query because keyboard
+   focus has to show the same state on every device; it fires when the
+   Learn more link inside the card takes focus, which is what makes the
+   state reachable without a mouse. */
+
+[data-area-card]:focus-within {
+  background-color: var(--area-bg-hover);
+  border-color: var(--area-border-hover);
+  color: var(--area-fg-hover);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-area-card]:hover {
+    background-color: var(--area-bg-hover);
+    border-color: var(--area-border-hover);
+    color: var(--area-fg-hover);
+  }
+}
+
+/* The title and the body inherit `color` from the card, so the two rules
+   above already carry them. The Button does not: MAST's Secondary variant
+   binds its text and border to a Webflow variable, not to `currentColor`,
+   so it has to be named. The attribute is repeated for specificity — a
+   single `[data-area-card]` descendant selector ties with MAST's own
+   `.button` rules and the tie is decided by stylesheet load order, which
+   this project does not control. Same trick as `button.css`. */
+
+[data-area-card][data-area-card]:focus-within .button {
+  color: var(--area-fg-hover);
+  border-color: var(--area-fg-hover);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-area-card][data-area-card]:hover .button {
+    color: var(--area-fg-hover);
+    border-color: var(--area-fg-hover);
+  }
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────
+   A state, not an off switch: the card still inverts, it just arrives
+   instantly instead of fading. */
+@media (prefers-reduced-motion: reduce) {
+  [data-area-card] {
+    transition-duration: 0s;
+  }
+}
+
+/* No anti-FOUC CSS, deliberately: nothing here is hidden. The resting card
+   is the card's static state, and if this stylesheet never loaded the grid
+   would still read correctly — it would simply never invert. */

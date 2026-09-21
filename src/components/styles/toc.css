@@ -1,0 +1,38 @@
+/*
+Table of contents — what the Designer cannot express.
+
+The sticky offset, the link's resting look and its .cc-active state all live in
+Webflow (.article_toc, .article_toc-link, .article_toc-link.cc-active). What is
+here is the scroll behaviour the links depend on and the focus ring.
+
+No anti-FOUC: the aside is empty until the JS fills it, so before that there is
+nothing to flash. If the script never runs, the reader gets the article without
+an index — which is the article.
+*/
+
+/* The links jump to headings inside the article, and the nav is sticky and
+   ~70px tall. Without this the target heading lands under it. */
+[data-toc-source] h2 {
+  scroll-margin-top: 7rem;
+}
+
+[data-toc-list] a:focus-visible {
+  outline: 2px solid var(--_color---brand--olive-green);
+  outline-offset: 2px;
+}
+
+/* Below the two-column breakpoint the aside sits above the article in normal
+   flow, so a long index would push the first paragraph off the first screen. */
+@media screen and (max-width: 991px) {
+  [data-toc] {
+    border-bottom: 1px solid var(--_color---brand--divider-on-light);
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-toc-list] a {
+    transition-duration: 0s;
+  }
+}
