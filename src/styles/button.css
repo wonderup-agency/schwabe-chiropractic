@@ -12,14 +12,22 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
 */
 
 /* ── Tokens ──────────────────────────────────────────────────────────
-   `motion.js` can't be imported into CSS, so the two values it would
-   provide are custom properties instead. 300ms and this curve are MAST's
-   own — `.button` already transitions background-color and border-color
-   with them, and matching means the button doesn't animate against
-   itself. Change these two and every part of the hover follows. */
+   `motion.js` can't be imported into CSS, so the values it would provide
+   are custom properties instead. 300ms and this curve are MAST's own —
+   `.button` already transitions background-color and border-color with
+   them.
+
+   There are TWO durations, and the split is deliberate: movement runs at
+   MAST's 300ms, colour at 160ms. Colour has to be faster because the
+   Primary inverts and its two colours cross — see "the crossing" further
+   down before touching either value. */
 [data-btn] {
   --btn-dur: 300ms;
   --btn-ease: cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  /* Colour gets its OWN, shorter duration, and that is a bug fix — see
+     "the crossing" below. Movement (the arrow) keeps `--btn-dur`. */
+  --btn-dur-color: 160ms;
 
   /* How much colour the Secondary's wash carries. It's a mix against
      `transparent`, not a flat token, so the tint reads the same over
@@ -81,18 +89,48 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
    make the border or background snap while the rest eases. */
 [data-btn] {
   transition:
-    background-color var(--btn-dur) var(--btn-ease),
-    border-color var(--btn-dur) var(--btn-ease),
-    color var(--btn-dur) var(--btn-ease);
+    background-color var(--btn-dur-color) var(--btn-ease),
+    border-color var(--btn-dur-color) var(--btn-ease),
+    color var(--btn-dur-color) var(--btn-ease);
 }
+
+/* THE CROSSING — why colour runs at 160ms and not MAST's 300ms.
+
+   Reported as a blink on the button hover, and it is the same defect as the
+   symptom card's: the Primary variant INVERTS, so its two colours swap past
+   each other.
+
+     text        #fbfaf8  ->  #474d33
+     background  #6b744e  ->  #fbfaf8
+
+   Halfway through, the label is about #a1a396 and the fill about #b3b7a3 —
+   roughly 1.2:1. The label vanishes into its own button at the midpoint of
+   the transition and comes back. At 300ms that dead zone lasts long enough
+   to read as a flash; at 160ms it is over in about 20ms and reads as a
+   switch.
+
+   No ordering avoids it: lead with the text and you get light-on-light,
+   lead with the fill and you get dark-on-dark. Duration is the only lever.
+   The same measurement and the same conclusion are written up at the bottom
+   of `symptom-card.css`.
+
+   THE SECONDARY IS NOT AFFECTED and must not be "fixed" to match: it washes
+   instead of inverting — its fill takes a 12% tint and its label does not
+   move — so its colours never cross.
+
+   This does NOT reintroduce the desync this file warns about above. That
+   warning is about our transition fighting MAST's: declaring the shorthand
+   replaces MAST's list wholesale, so all three properties run on our clock,
+   not two on ours and one on MAST's. What must stay together is the border
+   and the background, and they do. */
 
 /* The disc. `.cc-circle` is our own combo and it is what makes the disc a
    disc — targeting it means buttons whose right icon has no circle never
    get a background painted behind a bare glyph. */
 [data-btn] [data-btn-icon] > .cc-circle {
   transition:
-    background-color var(--btn-dur) var(--btn-ease),
-    color var(--btn-dur) var(--btn-ease);
+    background-color var(--btn-dur-color) var(--btn-ease),
+    color var(--btn-dur-color) var(--btn-ease);
 }
 
 /* The arrow. Matching the Phosphor glyph class rather than a position

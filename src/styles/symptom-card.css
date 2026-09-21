@@ -25,8 +25,10 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
 */
 
 [data-symptom-card] {
-  /* MAST's own pair, the same one `button.css` and `area-card.css` use. */
-  --symptom-dur: 300ms;
+  /* 160ms, NOT the 300ms that `button.css` and `area-card.css` use, and the
+     difference is load-bearing. See "the crossing" at the bottom of this
+     file — at 300ms this card blinks. */
+  --symptom-dur: 160ms;
   --symptom-ease: cubic-bezier(0.165, 0.84, 0.44, 1);
 
   /* Arrival values only. The resting ones are whatever `.symptoms_card`
@@ -112,6 +114,45 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
    The lesson, for the next card: name a child only when it does not
    inherit. If it does, naming it converts one transition into two, and any
    drift between them shows up as a flash. */
+
+/* THE CROSSING, AND WHY THE DURATION IS 160ms AND NOT 300ms.
+
+   Removing the child rule above fixed most of the flash but not all of it —
+   reported back as "sigue haciendo un blink mas sutil". Measured on the live
+   markup with the real marquee, sampling the card's text band frame by frame
+   and tracking contrast (pixel standard deviation) rather than brightness:
+
+     resting  30.5
+     mid      23.9   <- the dip
+     hovered  41.7
+
+   The cause is arithmetic, not a rendering artifact. The two colours swap
+   past each other:
+
+     text        #474d33  ->  #fbfaf8
+     background  #fbfaf8  ->  #262f23
+
+   Halfway through, the text is about #a1a395 and the card is about #90948d.
+   That is a contrast ratio of roughly 1.1:1 — the copy is invisible at the
+   midpoint of its own transition, then comes back. A blink.
+
+   NO AMOUNT OF DELAY FIXES THIS, which is worth writing down because it is
+   the first thing anyone will try:
+
+     text leads the background -> light text on a still-light card
+     background leads the text -> dark text on an already-dark card
+     both together             -> both land in the same mid-grey
+
+   Every ordering passes through a state with no contrast. The only variable
+   left is how long it lasts, so the duration is the fix: at 160ms the
+   crossing is over in roughly 20ms and reads as a switch rather than a fade
+   through nothing.
+
+   So do not "restore consistency" by pushing this back to the 300ms the rest
+   of the card family uses. Those cards keep their text colour and only move
+   their background, so they never cross. This one inverts, and inverting is
+   what costs the contrast. If the design ever stops inverting the copy, 300ms
+   becomes safe again. */
 
 /* ── Reduced motion ────────────────────────────────────────────────────
    A state, not an off switch: the card still inverts, it just arrives
