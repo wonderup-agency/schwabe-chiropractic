@@ -80,18 +80,38 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
     background-color: var(--symptom-bg-hover);
     color: var(--symptom-fg-hover);
   }
-
-  /* The copy is a MAST `Plain Text` instance. `color` on the card should
-     reach it by inheritance, but MAST's type classes set colour on some
-     variants, and a tie there is decided by stylesheet load order, which
-     this project does not control. The attribute is repeated for
-     specificity (0,2,0) so the descendant rule wins outright — the same
-     trick `button.css` and `area-card.css` use. */
-  [data-symptom-card][data-symptom-card]:hover .plain-text,
-  [data-symptom-card][data-symptom-card]:hover .heading-text {
-    color: var(--symptom-fg-hover);
-  }
 }
+
+/* THE TEXT IS NOT NAMED HERE, AND THAT IS THE FIX FOR A REAL BUG.
+
+   The first version of this file also set the colour on the children:
+
+     [data-symptom-card][data-symptom-card]:hover .plain-text { color: … }
+
+   copied from `area-card.css`, where naming the child IS necessary because
+   MAST's Button binds its colour to a Webflow variable rather than to
+   `currentColor`. That reasoning does not transfer. Checked against the
+   published stylesheet: none of the `.plain-text` or `.heading-text` rules
+   declare `color` at all — every one of them is a variant rule that only
+   sets type. So the copy already inherits from the card.
+
+   With the child named, the bug was visible: the descendant rule has no
+   transition of its own, so on hover the text snapped to beige in one frame
+   while the card's background took 300ms to darken. For most of that
+   transition the text was beige on a still-beige card — invisible, then
+   back. Reported as "un blink medio raro la primera vez que hago hover",
+   and worst on the first hover because on later ones the background has
+   usually not finished fading back yet, so there is still some contrast.
+
+   Removing the rule fixes it outright rather than papering over it: the
+   card transitions `color`, and an inherited value follows the parent's
+   animated value frame by frame, so the copy and the background now cross
+   together. Adding a matching transition to the child would also have
+   worked, but it would be a second place to keep the duration in sync.
+
+   The lesson, for the next card: name a child only when it does not
+   inherit. If it does, naming it converts one transition into two, and any
+   drift between them shows up as a flash. */
 
 /* ── Reduced motion ────────────────────────────────────────────────────
    A state, not an off switch: the card still inverts, it just arrives

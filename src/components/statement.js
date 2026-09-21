@@ -25,8 +25,17 @@ import {
 } from '../utils/motion.js'
 
 const STATEMENT = {
-  // Scroll the pin consumes, as a share of the viewport.
-  pin: '+=100%',
+  // Extra scroll the pin holds AFTER the last word lands, as a share of the
+  // viewport. The pin's total length is `revealIntoPin + hold`, so at 0 it
+  // releases the moment the sentence is complete.
+  //
+  // It used to be a flat `pin: '+=100%'`, which was 0.6 of a viewport —
+  // ~540px at 900 tall — of scrolling with the sentence already finished and
+  // nothing left to animate. Reported as wanting to keep scrolling once the
+  // text is in. Deriving the length from `revealIntoPin` instead of hard-
+  // coding it is what stops the two drifting apart again: raise
+  // `revealIntoPin` and the pin follows.
+  hold: 0,
   // Where the words start appearing, as a share of the viewport height from
   // the top. 0.7 means "when the section's top reaches 70% down the screen" —
   // i.e. while it is still rising, before it reaches the top.
@@ -176,12 +185,21 @@ export default function (elements) {
             },
           })
 
-          // The pin. No animation of its own — it holds the finished sentence
-          // on screen so it cannot be scrolled past.
+          // The pin. No animation of its own — it holds the sentence on
+          // screen while the words arrive, then releases.
+          //
+          // The length is derived, not fixed: the reveal finishes exactly
+          // `revealIntoPin` into the pin, so anything past that is scroll
+          // where the sentence is already complete and nothing moves. `hold`
+          // buys a deliberate beat there if one is ever wanted; at 0 the pin
+          // lets go the moment the last word lands.
           ScrollTrigger.create({
             trigger: wrapper,
             start: 'top top',
-            end: STATEMENT.pin,
+            end: () =>
+              `+=${
+                window.innerHeight * (STATEMENT.revealIntoPin + STATEMENT.hold)
+              }`,
             pin: true,
             pinSpacing: true,
             invalidateOnRefresh: true,
