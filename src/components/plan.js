@@ -77,6 +77,26 @@ export default function (elements) {
       step.querySelector('[data-plan-detail]')
     )
 
+    /*
+     * What the dim is applied to, and why it is NOT the step.
+     *
+     * `.plan-step_num` is an 80px disc filled with the SAME Forest Green as
+     * the section, sitting on top of the vertical rule. It reads as nothing
+     * at all — its whole job is to mask the rule where it would cross the
+     * numeral, which is how the Figma draws the gaps.
+     *
+     * Dimming the step dims that disc too, and a 40%-opaque mask stops
+     * masking: the rule reappears straight through the 2 and the 3, which is
+     * exactly what got reported. So the dim goes on the copy and the numeral
+     * stays opaque — which also matches the Figma, where all three numerals
+     * are equally present.
+     *
+     * Falls back to the step if the hook is missing, so a copy of this
+     * markup without `data-plan-body` still dims rather than doing nothing.
+     */
+    const bodies = stepEls.map((step) => step.querySelector('[data-plan-body]'))
+    const dimTargets = bodies.every(Boolean) ? bodies : stepEls
+
     // Nothing to hand over with fewer than two steps, and a missing detail
     // would collapse a step to nothing. Either way the static markup reads
     // perfectly, so leave it alone.
@@ -178,8 +198,11 @@ export default function (elements) {
           })
           // t=0 of the timeline: the first step is the one being read.
           gsap.set(details[0], { height: natural[0], opacity: 1 })
-          gsap.set(stepEls, { opacity: PLAN.dim })
-          gsap.set(stepEls[0], { opacity: 1 })
+          // The step itself is only ever revealed — the anti-FOUC CSS starts
+          // it at 0 — and the dim lives one level in, on the copy.
+          gsap.set(stepEls, { opacity: 1 })
+          gsap.set(dimTargets, { opacity: PLAN.dim })
+          gsap.set(dimTargets[0], { opacity: 1 })
         }
 
         measure()
@@ -213,8 +236,8 @@ export default function (elements) {
             .to(details[i - 1], { height: 0, opacity: 0 }, swap)
             // Function-based so invalidateOnRefresh picks up the re-measure.
             .to(details[i], { height: () => natural[i], opacity: 1 }, swap)
-            .to(stepEls[i - 1], { opacity: PLAN.dim }, swap)
-            .to(stepEls[i], { opacity: 1 }, swap)
+            .to(dimTargets[i - 1], { opacity: PLAN.dim }, swap)
+            .to(dimTargets[i], { opacity: 1 }, swap)
         }
         // A final beat so the last step is readable before the pin lets go —
         // without it the third step lands on the frame the pin releases.
