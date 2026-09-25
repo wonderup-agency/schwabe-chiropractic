@@ -36,6 +36,15 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
   display: none;
 }
 
+/* The summary is the control, so its text is not there to be selected. Without
+   this a double-click highlights a word and toggles the card twice — measured
+   on the FAQ accordion on 2026-09-23, where it read as "it opens and closes".
+   The body copy inside `.job-card_content` stays selectable, which is what a
+   candidate would actually want to copy. */
+.job-card_summary {
+  user-select: none;
+}
+
 /* Open: the disc fills and the `+` loses its vertical stroke, becoming a `−`.
    `border-color` follows the fill so the 1px outline doesn't survive as a
    lighter ring around the filled circle. */

@@ -70,7 +70,15 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
 }
 
 /* On a dark surface a green wash is invisible, so the lift is a beige
-   one. Same idea, same restraint, and the text stays put here too. */
+   one. Same idea, same restraint, and the text stays put here too.
+
+   ⚠️ `.u-on-dark` is not used anywhere on the site — grepped across all
+   17 published pages on 2026-09-24, zero matches. This branch has never
+   run. It is kept because the case is real and will come back the day a
+   transparent Secondary lands on a dark band, but do NOT reach for it to
+   fix `.cc-on-dark`: that combo is a filled light pill, not a
+   transparent button, and the wash is the wrong destination for it. See
+   the `:not(.cc-on-dark)` note in the hover block below. */
 .u-on-dark [data-btn][data-wf--button--button-variant='secondary'] {
   --btn-bg-hover: color-mix(
     in srgb,
@@ -159,7 +167,21 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
    light-on-light. Doubling the attribute makes it (0,4,0) and settles
    it. */
 @media (hover: hover) and (pointer: fine) {
-  .button[data-btn][data-btn]:hover {
+  /* `.cc-on-dark` is excluded, and that is a fix, not an exception.
+
+     That combo is not a transparent Secondary — it is a FILLED beige pill
+     with olive text, sitting on a dark band. The wash above replaces its
+     background with a 12% tint over `transparent`, so the beige fill
+     disappears and the dark band shows through while the text goes to
+     Ink. Measured on /patient-stories on 2026-09-24: Ink `#474d33` on
+     Slate Ink `#465659` is **1.15:1**. The label vanished on hover.
+
+     The Designer already defines the right hover for it —
+     `.button.cc-on-dark:hover` takes the fill from Beige to Beige Muted
+     and keeps the olive text. Ours only had to get out of the way: with
+     `:not()` here, that (0,3,0) rule is the most specific one left and
+     wins on its own. */
+  .button[data-btn][data-btn]:not(.cc-on-dark):hover {
     background-color: var(--btn-bg-hover);
     color: var(--btn-fg-hover);
   }

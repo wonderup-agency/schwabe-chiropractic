@@ -6,16 +6,17 @@ The site's reusable entrance primitive. One component, driven by attributes,
 so a new fade or image reveal is an attribute in the Designer rather than a
 new file here.
 
-Variants live in BUILDERS below. Five are built:
+Variants live in BUILDERS below. Seven are built:
   mask            — an image reveal whose edge sweeps against the scroll
   words           — word-by-word text entrance (SplitText)
   parallax        — scrubbed drift, hook ON the element that moves
   parallax-media  — the same drift, hook on the CLIPPING CONTAINER instead
   stagger         — direct children entering one by one, once
   rule            — a decorative hairline drawing itself along its long axis
+  fade            — a plain opacity fade, the only variant with no anti-FOUC CSS
 
-The remaining variants specified in the animate skill's recipes.md (fade,
-fade-up/-down/-left/-right, lines, scale-in) drop into BUILDERS without
+The remaining variants specified in the animate skill's recipes.md
+(fade-up/-down/-left/-right, lines, scale-in) drop into BUILDERS without
 touching anything else.
 */
 
@@ -362,6 +363,64 @@ function buildRule(gsap, el) {
   })
 }
 
+/**
+ * A plain opacity fade. No travel, no scrub, no parallax.
+ *
+ * Built 2026-09-25 for Derek's note on the Patient Stories photo band:
+ * "the image fades in 0-100% slowly, then the closing line fades in shortly
+ * after it settles. Subtle, no movement, no parallax. [...] And nothing
+ * should be hidden by default, so the content still shows if the animation
+ * doesn't fire."
+ *
+ * That last sentence is a hard constraint, and it is why this is the only
+ * variant on the site with NO anti-FOUC CSS — check reveal.css: the hidden
+ * rule names its variants one by one and `fade` is deliberately absent. It
+ * buys the failure mode Derek asked for (no GSAP means the content is simply
+ * there) and it costs a flash: dist/styles.css lands before the first paint
+ * and GSAP several frames later, so a blanket `set(opacity: 0)` here would
+ * blink content the visitor is ALREADY LOOKING AT.
+ *
+ * The way out is to hide only what is below the fold at init. Something
+ * already on screen has nothing to reveal, so it is left alone and never
+ * animates; something below the fold is hidden before it could ever have
+ * been seen, so no frame exists in which it blinks. Both halves of Derek's
+ * constraint hold at once.
+ *
+ * Sequencing two of these is by scroll position plus `data-anim-delay`, NOT
+ * by a shared timeline — the image and the closing line are separate
+ * sections, and one timeline across both would need a grouping attribute the
+ * contract does not have. Same call as the mask/words pairing.
+ */
+function buildFade(gsap, el) {
+  const duration = readToken(el, 'data-anim-duration', DUR, DUR.base)
+  const delay = readNumber(el, 'data-anim-delay', 0)
+
+  // Already on screen when the component initialises: nothing to reveal, and
+  // hiding it now is the one thing this variant must never do.
+  if (el.getBoundingClientRect().top < window.innerHeight) {
+    gsap.set(el, { opacity: 1 })
+    return null
+  }
+
+  return gsap.fromTo(
+    el,
+    { opacity: 0 },
+    {
+      opacity: 1,
+      duration,
+      delay,
+      ease: EASE.out,
+      scrollTrigger: {
+        trigger: el,
+        start: readStart(el),
+        once: SCROLL.once,
+        refreshPriority: refreshOrder(el),
+        markers: isDev(),
+      },
+    }
+  )
+}
+
 // ── Registry ─────────────────────────────────────────────────────────
 
 const BUILDERS = {
@@ -375,6 +434,7 @@ const BUILDERS = {
   'parallax-media': ({ gsap, el }) => buildParallax(gsap, el, { media: true }),
   stagger: ({ gsap, el }) => buildStagger(gsap, el),
   rule: ({ gsap, el }) => buildRule(gsap, el),
+  fade: ({ gsap, el }) => buildFade(gsap, el),
 }
 
 // Variants that cost a frame on every scroll tick, and are therefore capped.
