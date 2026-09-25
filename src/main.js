@@ -99,30 +99,47 @@ window.addEventListener(
 )
 
 // ── Init ─────────────────────────────────────────────────────────────
-function init() {
-  ;(async () => {
-    try {
-      const module = await import('./components/global.js')
-      if (typeof module.default === 'function') {
-        console.log(
-          '%c🌍 [main.js] Loading global function',
-          'color: #a78bfa; font-weight: bold'
-        )
-        module.default()
-      } else {
-        console.warn(
-          '%c⚠️ [main.js] No valid default function found in global.js',
-          'color: #fbbf24; font-weight: bold'
-        )
-      }
-    } catch (error) {
-      console.error(
-        '%c❌ [main.js] Failed to load global function:',
-        'color: #f87171; font-weight: bold',
-        error
+/**
+ * Site-wide setup. Started in PARALLEL with the components, never awaited
+ * before them: nothing a component does depends on global.js having finished.
+ *
+ * Awaiting it used to serialise the whole cascade — main.js, then global.js,
+ * then the component chunk, three round trips nose to tail. Warm that is ~76ms
+ * and invisible; on a cold jsDelivr edge, where each file is fetched from
+ * GitHub on demand, it is the difference between one wait and three. The
+ * article index was the place it showed, because its column sits empty until
+ * its chunk lands.
+ *
+ * The FOUC failsafe that global.js arms is a 3s timer, so it does not care
+ * whether it is armed before or after a component runs.
+ */
+async function loadGlobal() {
+  try {
+    const module = await import('./components/global.js')
+    if (typeof module.default === 'function') {
+      console.log(
+        '%c🌍 [main.js] Loading global function',
+        'color: #a78bfa; font-weight: bold'
+      )
+      module.default()
+    } else {
+      console.warn(
+        '%c⚠️ [main.js] No valid default function found in global.js',
+        'color: #fbbf24; font-weight: bold'
       )
     }
-    await Promise.all(components.map(loadComponent))
+  } catch (error) {
+    console.error(
+      '%c❌ [main.js] Failed to load global function:',
+      'color: #f87171; font-weight: bold',
+      error
+    )
+  }
+}
+
+function init() {
+  ;(async () => {
+    await Promise.all([loadGlobal(), ...components.map(loadComponent)])
 
     if (skippedComponents.length) {
       console.log(

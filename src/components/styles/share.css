@@ -1,0 +1,56 @@
+/*
+  share — what the Designer cannot express.
+
+  NO anti-FOUC rule here, and that is deliberate: nothing is hidden. The row
+  ships visible and the JS only fills in hrefs. If the bundle never lands the
+  four icons are inert, which is the same degradation filter.js chose — do
+  nothing rather than hide something.
+*/
+
+/* The copy control is a link with no href, so it is not focusable on its own
+   and gets no focus ring for free. role/tabindex come from the JS; the ring
+   has to come from here. */
+[data-share='copy'] {
+  cursor: pointer;
+}
+
+[data-share]:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
+/* Confirmation after a successful copy. Colour only — the row sits at the end
+   of a long read and a control that jumps draws the eye back up. The state is
+   announced through aria-label, which the component swaps at the same time. */
+[data-share='copy'].cc-copied {
+  background-color: currentColor;
+}
+
+[data-share='copy'].cc-copied > * {
+  opacity: 0;
+}
+
+[data-share='copy'].cc-copied::after {
+  content: '✓';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+/* The tick is positioned against the control, so the control has to be a
+   containing block. The Designer has no reason to set this, and without it the
+   tick escapes to the nearest positioned ancestor. */
+[data-share='copy'] {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-share] {
+    transition: none;
+  }
+}

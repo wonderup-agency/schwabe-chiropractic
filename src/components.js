@@ -14,6 +14,10 @@
 
 export default [
   {
+    selector: "[data-component='share']",
+    importFn: () => import('./components/share.js'),
+  },
+  {
     selector: "[data-component='plan']",
     importFn: () => import('./components/plan.js'),
   },
