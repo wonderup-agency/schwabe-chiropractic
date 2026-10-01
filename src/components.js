@@ -14,6 +14,14 @@
 
 export default [
   {
+    selector: "[data-component='announcement']",
+    importFn: () => import('./components/announcement.js'),
+  },
+  {
+    selector: "[data-component='readtime']",
+    importFn: () => import('./components/readtime.js'),
+  },
+  {
     selector: "[data-component='share']",
     importFn: () => import('./components/share.js'),
   },

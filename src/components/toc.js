@@ -15,6 +15,9 @@ import './styles/toc.css'
 
 const ACTIVE = 'cc-active'
 const LINK_CLASS = 'toc_link'
+// Phosphor, like every other icon on the site — the font is already loaded, so
+// this costs no asset. The site only ships the `regular` weight.
+const ICON_CLASS = 'ph ph-arrow-up-right toc-link_icon'
 
 /** Turns a heading's text into a stable id. */
 function slugify(text, used) {
@@ -42,7 +45,20 @@ function buildLinks(headings, list) {
     const link = document.createElement('a')
     link.className = LINK_CLASS
     link.href = `#${heading.id}`
-    link.textContent = heading.textContent
+
+    // The arrow the Figma puts on the item you are reading. It is always in
+    // the DOM and always holds its 16px — only its opacity changes. The frame
+    // draws the active item's text indented by 28px and the others flush,
+    // which in a static mockup reads as emphasis and in a scrolling page would
+    // make every line jump sideways as the active section changes.
+    const icon = document.createElement('span')
+    icon.className = ICON_CLASS
+    icon.setAttribute('aria-hidden', 'true')
+
+    const text = document.createElement('span')
+    text.textContent = heading.textContent
+
+    link.append(icon, text)
     list.appendChild(link)
 
     return { heading, link }

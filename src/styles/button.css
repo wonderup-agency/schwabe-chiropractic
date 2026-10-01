@@ -69,6 +69,29 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
   --btn-circle-fg-hover: var(--_color---brand--beige);
 }
 
+/* The Colorado Shockwave buttons keep their own colour on hover.
+
+   `.cc-slate` (Home: the co-brand band and the big Shockwave card) and
+   `.cc-teal` (Care Hub bridge) are Secondaries tinted to the partner
+   brand: teal border, slate text, teal disc (`.cc-circle-teal`). Without
+   this block they inherited the olive wash above and went green on hover,
+   which is the "the arrow is a different colour" report of 2026-10-01.
+   Same 12% wash, mixed from the partner teal instead of the brand olive,
+   and the text stays slate. The disc is not named: `.cc-circle-teal` is
+   not `.cc-circle`, so the disc rule below never repaints it.
+
+   Two attributes-worth of specificity, (0,2,0), the same as the Secondary
+   rule above. It wins by coming later in the file, so keep it here. */
+[data-btn].cc-slate,
+[data-btn].cc-teal {
+  --btn-bg-hover: color-mix(
+    in srgb,
+    var(--_color---partner--shockwave-teal) var(--btn-tint),
+    transparent
+  );
+  --btn-fg-hover: var(--_color---brand--slate-ink);
+}
+
 /* On a dark surface a green wash is invisible, so the lift is a beige
    one. Same idea, same restraint, and the text stays put here too.
 

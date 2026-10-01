@@ -16,6 +16,30 @@ an index — which is the article.
   scroll-margin-top: 7rem;
 }
 
+/* The active item's arrow. Its space is reserved on every link so the text
+   never shifts; see the comment in toc.js.
+
+   The layout rule beats .toc_link (0,1,0) on purpose by naming the list as an
+   ancestor (0,2,0) — .toc_link is a Designer class and declares display:block,
+   and an even fight would be decided by stylesheet order, which we do not
+   control. */
+[data-toc-list] .toc_link {
+  display: flex;
+  align-items: baseline;
+  column-gap: 0.75rem;
+}
+
+.toc-link_icon {
+  opacity: 0;
+  flex: none;
+  font-size: 1rem;
+  transition: opacity 300ms cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.toc_link.cc-active .toc-link_icon {
+  opacity: 1;
+}
+
 [data-toc-list] a:focus-visible {
   outline: 2px solid var(--_color---brand--olive-green);
   outline-offset: 2px;
@@ -32,7 +56,8 @@ an index — which is the article.
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-toc-list] a {
+  [data-toc-list] a,
+  .toc-link_icon {
     transition-duration: 0s;
   }
 }

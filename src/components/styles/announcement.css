@@ -1,0 +1,32 @@
+/*
+  announcement — what the Designer cannot express.
+
+  NO anti-FOUC rule here, and that is the whole point. The bar ships VISIBLE and
+  the component only ever REMOVES it. Hiding it by default and revealing it with
+  JS would mean that a bundle which never lands hides the announcement from
+  everyone — the opposite of what an announcement is for.
+
+  The price is honest and worth writing down: a returning visitor who already
+  dismissed the bar sees it for the few frames between first paint and the
+  module running, and the page shifts up when it goes. Killing that needs a
+  blocking inline script stamping a class on <html>, which lives in MAST's
+  HtmlEmbed — and the MCP cannot edit embeds. See .claude/rules/components/announcement.md.
+*/
+
+/* The dismiss is a div with role="button", so it is not focusable on its own
+   and gets no focus ring for free. Same shape as share.js's copy control. */
+[data-announcement='close'] {
+  cursor: pointer;
+}
+
+[data-announcement='close']:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+  border-radius: 999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-announcement='close'] {
+    transition: none;
+  }
+}

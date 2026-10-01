@@ -1,0 +1,33 @@
+/*
+El ® formateado. La regla y el recorrido viven en src/utils/registered.js.
+
+Derek pide dos cosas medibles: ~60% del tamaño del texto, y el tope del glifo
+aproximadamente a la CAP HEIGHT — no el superíndice por defecto de la fuente,
+que sube más y deja el ® flotando arriba de la línea.
+
+La cuenta del -0.45em, porque no es un número elegido a ojo:
+
+  · la cap height ronda 0.70em del tamaño del texto
+  · el ® a 0.6em mide ~0.43em de alto (es un glifo de caja casi cuadrada,
+    de alto cercano a la cap height de su propio tamaño)
+  · para que su TOPE quede en 0.70, su base tiene que estar en 0.70 − 0.43 =
+    0.27em del texto padre
+  · pero `top` resuelve contra el em DEL PROPIO SUP, que es 0.6em del padre —
+    así que el valor a escribir es 0.27 / 0.6 = 0.45
+
+Escribir -0.27em acá sería subirlo 0.16em del padre, o sea menos de la mitad
+de lo que hace falta. Es la trampa de que `em` cambia de referencia adentro de
+un elemento que redefine su font-size.
+
+Las tres primeras declaraciones NO son redundantes: el user-agent le da al
+<sup> `font-size: smaller` y `vertical-align: super`, y las dos hay que
+pisarlas o el 60% y la altura no son los nuestros.
+*/
+
+.u-reg {
+  font-size: 0.6em;
+  vertical-align: baseline;
+  line-height: 0;
+  position: relative;
+  top: -0.45em;
+}

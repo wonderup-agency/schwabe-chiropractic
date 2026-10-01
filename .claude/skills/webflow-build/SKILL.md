@@ -130,12 +130,14 @@ Read this section before any MCP write. These are confirmed behaviors, not theor
 
 **Writes that lie**
 - `"success"` means the call was accepted, not that the change persisted. **Verify after every structural write.**
+- **A CMS binding written as a component-instance prop on a collection template page is silently discarded.** `set_component_instance_prop_values` with `type: "bindable"` returns success *and echoes the binding back in its response*, but the prop is gone on the next read — not null, absent. Reproduced on Schwabe 2026-09-21 across three different components; `get_bindable_sources` on the same elements listed the collection fields as valid, so it is not a missing CMS context. The same binding **inside a Collection List persists fine**. On a template page, bind **native elements** (`data_element_builder`) through `data_element_settings_tool > set_settings` instead — keys `text` and `richText` — which is a different code path and does persist. Practical consequence: a template page cannot use the framework's text components for anything bound. Only a `get_` read catches this; the `set_` response looks correct.
 - Form-typed elements (`<label>`, `<input>`, sometimes `<button>`) created outside a real `<form>` wrapper are **silently purged** by Webflow's validation pass moments later. Create the form block first, then children.
 - `update_style` with `breakpoint_id: "main"` passed explicitly is a silent no-op. **Omit `breakpoint_id`** for main; specify it only for `small` / `medium` / `tiny`.
 - `variable_as_value` expects `variable-{uuid}` — with the prefix, not the bare UUID.
 
 **Reads that mislead**
 - `query_elements` with `element_filter: {style: "..."}` is unreliable for class names containing spaces. Use a substring match instead.
+- **A page-level `query_elements` returns zero matches for anything inside a component instance** — including `type` and `tag` filters, not just `style`. On a site where every section is a component (MAST builds this way), that reads exactly like a dead Designer connection. Tell them apart with `get_all_elements` at `depth: 1`: if the tree comes back, the connection is fine and the answer is `scope_component_id`. Confirmed on Schwabe 2026-09-15, where five filters in a row returned 0 on a perfectly live session.
 - For verifying compiled selectors, variant attributes, and which classes are actually in use, **curl the published CSS/HTML** from the CDN. It's more trustworthy than style queries.
 - Component reads need `includeProps: true, includeVariants: true` to return variant IDs and display names. Per-variant overrides come from the variant styles action, keyed by variant ID + pseudo state.
 
