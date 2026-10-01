@@ -1495,3 +1495,44 @@ Probe de 6 perfiles × light/dark sobre `#hero`, `#fees-at-a-glance`,
 Our Story): 0 desbordes, 0 tap targets bajo 44px. `.find-us_overlay` en ≤991
 queda con `opacity: 1`, fondo transparente y la pill abajo, porque en touch no
 hay hover que la revele.
+
+### 2026-10-01 · Home completa + el patrón de pasos en mobile
+
+`/responsive` sobre las 16 sections de la Home (6 perfiles × light/dark). **0 scroll horizontal.** Arreglado: `#plan` (disco 48px, línea re-centrada), Four Things *Stacked* / *Stacked Light* (mismo patrón que `#plan`), y `.footer_brand`, que desbordaba 9px a 1024 porque `30rem + 17.5rem + 2×5rem` no entra en el container del iPad landscape (ahora esos valores viven en `large`). Quedan los tap targets preexistentes (announcement link, footer links, CTA del nav). Re-medido con `scripts/probe.js` de la skill `figma-parity`, que ahora es el probe de referencia.
+
+**Regla nueva**: una fila de "número + texto" con línea vertical **no apila el número arriba del texto en mobile**. Mantiene dos columnas (3rem + 1fr) y la línea centrada bajo el número. Ver la skill `figma-parity`, paso 4.
+
+### 2026-10-01 · Barra de anuncio y escala de títulos en mobile
+
+- **Announcement Bar ≤767**: 14px, padding 8px, y el link sigue a la frase en la misma línea de texto (`.announcement_inner` pasa a `block`, `.announcement_text` a `inline`). De 94 a **59px**, dos líneas máximo de 320 a 430.
+- **H2 / H3 en el modo `Mobile` de Typography**: mínimos 2rem y 1.75rem (antes 2.25 y 2). El clamp fluido no se tocó, así que tablet y desktop quedan igual. H1 40–42 / H2 32–34 / H3 28 a 320–430.
+- Probe re-corrido sobre la Home: sólo quedan los tap targets preexistentes.
+
+
+### 2026-10-01 · Our Story `#our-clinic`: grid en desktop, slider en mobile
+
+- ≥992: 3 columnas. 768–991: 2 columnas. ≤767: fila horizontal.
+- Mobile sin JS (hasta el deploy): `.clinic_items` con `overflow-x: auto` +
+  `scroll-snap-type: x mandatory`, items al 85%, flechas ocultas. Con JS:
+  Swiper 1.15 slides (1.6 a ≥480), la card siguiente asoma hasta el borde del
+  viewport y `.section.cc-clinic` la recorta con `overflow-x: clip`.
+- `probe.js` sobre `#our-clinic,.cc-clinic,#find-us` en 6 perfiles × light/dark:
+  sin scroll horizontal ni tap targets chicos. Los `clinic_item` fuera de
+  pantalla son el slider y ahora se filtran en el probe.
+
+
+### 2026-10-01 · Our Story: deltas de Figma + estados de formulario
+
+- Card de la cita: a 390 pisaba la Bio por 14px con el tamaño nuevo; `bottom: -2rem` en ≤767 deja 18px.
+- CTA Split: botones en una fila a 1440 y 768, apilados a 1024 (panel de 557px) y 390.
+- Find Us: a 1024 el mapa queda en 467 de ancho; en ≤991 sigue el grid de 1 columna.
+- Probe: Our Story (8 sections), Home (`#find-us`, `.cc-cta`), New Patients, Community Partners, Fees y Patient Stories (`.cc-cta`), Join (`.w-form`): **OK**. Contact `.w-form`: inputs de 38px con fuente <16px, **preexistente**, anotado en TODO.
+
+- Contact: inputs sin clase (38px / 14px) → `inquiry_input` / `inquiry_textarea` (48px / 16px). `.inquiry_grid` pasa a 1 columna en ≤991: el form desbordaba 177..433 de 320 a 430. Re-probe Contact, Join, Home `.w-form` y Our Story completa: OK.
+
+
+### 2026-10-01 · Team, Community Partners y Join
+
+- Probe en las 3 páginas completas y `.cc-cta` en Home, New Patients, Our Story y Fees: OK en 12 perfiles.
+- `.partner_link` medía 27px de alto: min-height 2.75rem con el texto pegado abajo para no mover el subrayado.
+- CTA Split 50/50: a ≥1280 el panel es de 680; con padding derecho 3rem los dos botones de Team entran en una fila.

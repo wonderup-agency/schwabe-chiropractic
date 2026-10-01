@@ -317,3 +317,13 @@ la píldora se apaga un tono, aparece el anillo oliva y la flecha se endereza.
 para todos los botones, así que **el modificador de disco que elijas en reposo
 tiene que ser el mismo color al que el hover lo lleva**, o el disco parpadea al
 existir. Con la píldora clara eso significa `cc-circle-olive`, no `cc-circle`.
+
+## Los botones de Colorado Shockwave conservan el teal — 2026-10-01
+
+`.cc-slate` (Home: banda de *What Makes This Different* y la card grande) y
+`.cc-teal` (Care Hub) son Secondaries con borde teal y texto slate, y desde el
+2026-10-01 llevan disco **`.icon-color.cc-circle-teal`** (Shockwave Teal
+`#719ca1`, flecha Beige). Al hover tomaban el lavado olive del Secondary;
+ahora `button.css` les da el mismo 12% de wash pero mezclado del teal, y el
+texto queda en Slate Ink. El disco no se repinta porque `cc-circle-teal` no es
+`.cc-circle`. Llega al sitio con el deploy del bundle.

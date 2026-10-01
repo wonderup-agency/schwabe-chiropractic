@@ -1,0 +1,32 @@
+/*
+Plain Text size modifiers that the Designer can't express
+
+MAST's Plain Text puts its `Class` prop on the wrapper (`.plain-text-component`)
+and its `Size` variant on the inner `.plain-text`, as
+`.plain-text:where(.w-variant-…)`. So a class passed from a parent component
+lands one level above the element that carries the type, and a combo on the
+wrapper can't reach it from the Designer (no descendant selectors).
+
+The variant rules read their size from `:root` custom properties
+(`--_typography---<size>--font-size`). Custom properties inherit, so
+redefining one on the wrapper resizes the inner text without fighting the
+variant's specificity. Colour needs nothing here: no `.plain-text` rule sets
+`color`, so the Designer combo `.plain-text-component.cc-meta` already reaches
+the text by inheritance.
+
+- `cc-body`: a `paragraph-lg` instance rendered at body size (16px). Used by the
+  Team CTA paragraph via the CTA Banner `Paragraph Class` prop (Figma 16px,
+  the other CTAs stay at 18px).
+- `cc-meta`: an `eyebrow` instance at 14px. Used by the partner card category
+  line and link (Figma DM Sans Medium 14px uppercase Olive).
+
+Loaded from global.js, so it ships in dist/styles.css on every page.
+*/
+
+.plain-text-component.cc-body {
+  --_typography---paragraph-lg--font-size: 1rem;
+}
+
+.plain-text-component.cc-meta {
+  --_typography---eyebrow--font-size-small: 0.875rem;
+}

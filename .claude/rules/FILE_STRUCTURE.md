@@ -16,6 +16,7 @@
 │   │   ├── readtime.js            Calcula el "N min read" del artículo contando palabras del cuerpo
 │   │   ├── plan.js                cc-plan — acordeón de 3 pasos por scroll, dentro de un pin
 │   │   ├── share.js               Fila "Share this post" del artículo: copiar link + 3 intents
+│   │   ├── clinic-slider.js       Our Story #our-clinic — Swiper sólo bajo 768, grid arriba
 │   │   └── styles/
 │   │       ├── announcement.css  Focus ring del control de cerrar. NO lleva anti-FOUC
 │   │       ├── nav.css           Injected-node styles for the nav's scrolled state
@@ -24,7 +25,8 @@
 │   │       ├── filter.css        Lo que el Designer no expresa del chip + el ocultado del item
 │   │       ├── toc.css           scroll-margin de los headings + focus ring de los links
 │   │       ├── plan.css         Colapso de los pasos (scopeado al breakpoint pineado) + failsafe que ABRE
-│   │       └── share.css        Focus ring del control de copiar + su confirmación
+│   │       ├── share.css        Focus ring del control de copiar + su confirmación
+│   │       └── clinic-slider.css Deshace el fallback scroll-snap mientras Swiper está montado + flechas
 │   ├── styles/
 │   │   ├── theme.css              Pins the token palette to light (no dark design)
 │   │   ├── button.css             Button hover (colour inversion + arrow)
@@ -60,7 +62,7 @@
 │
 ├── .claude/
 │   ├── CLAUDE.md                  Project instructions for Claude
-│   ├── skills/                    Claude skill definitions
+│   ├── skills/                    Claude skill definitions (incl. figma-parity/ con sus scripts de comparación)
 │   └── rules/
 │       ├── TODO.md               La lista viva de pendientes — se lee al empezar, se actualiza siempre
 │       ├── ARCHITECTURE.md        System design and data flow

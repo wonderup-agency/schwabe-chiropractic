@@ -1,0 +1,37 @@
+/*
+clinic-slider · only applies while Swiper is mounted (< 768px).
+Undoes the Webflow native-scroll fallback so Swiper owns the movement.
+*/
+
+.clinic_inner.is-slider .clinic_list {
+  /* The next card peeks out to the viewport edge; .section.cc-clinic clips it. */
+  overflow: visible;
+}
+
+.clinic_inner.is-slider .clinic_items {
+  display: flex;
+  overflow: visible;
+  scroll-snap-type: none;
+  column-gap: 0;
+  gap: 0;
+  box-sizing: content-box;
+  transition-property: transform;
+}
+
+.clinic_inner.is-slider .clinic_item {
+  flex: 0 0 auto;
+  scroll-snap-align: none;
+}
+
+.clinic_inner.is-slider .clinic_nav {
+  display: flex;
+}
+
+.clinic_nav .swiper-button-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.clinic_nav .swiper-button-lock {
+  display: none;
+}

@@ -53,4 +53,8 @@ export default [
     selector: "[data-component='nav']",
     importFn: () => import('./components/nav.js'),
   },
+  {
+    selector: "[data-component='clinic-slider']",
+    importFn: () => import('./components/clinic-slider.js'),
+  },
 ]

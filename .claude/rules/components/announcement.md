@@ -168,3 +168,13 @@ push + **bumpear el hash del CDN**.
 Falta medir: que el descarte persista y expire a los 14 días, que un mensaje
 nuevo vuelva a aparecer aunque el anterior esté descartado, que Enter y Espacio
 cierren, que una ventana privada no rompa nada, y el salto de layout al remover.
+
+## Mobile — 2026-10-01
+
+El `div` de la frase **ya tiene clase**: `announcement_text`. Antes quedaba sin
+clase a propósito (no declaraba nada), pero para que la barra entre en dos
+líneas en el teléfono la frase tiene que ser `inline` y el link seguirla en la
+misma línea de texto. En ≤767: `.announcement` 14px / padding 8px,
+`.announcement_inner` `display: block`, `.announcement_text` `inline`,
+`.announcement_link` `inline-flex` con 6px a la izquierda. Medido: 59px de alto
+de 320 a 430 (antes 94).

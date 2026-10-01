@@ -168,6 +168,7 @@ When a task matches one of these skills, **always use it** — don't run the ste
 - `/deploy` — Use when deploying to production. Runs build, commits dist/, and pushes to GitHub.
 - `/animate [what]` — Use when building **any** animation or motion interaction. Owns the site's motion language, forces official docs before code, and handles the playground workflow.
 - `/responsive` — Use when finishing any section, and whenever something looks wrong on mobile or tablet. Measures the six viewport profiles with Chrome DevTools, reports, then fixes after your OK.
+- `/figma-parity` — Use when comparing a page against its Figma frame ("revisá X contra Figma", "qué diferencias ves"). Section-by-section sheets, the recurring-error catalog, then `/responsive`.
 - `/audit` — Use when checking project health. Finds orphan components, ghost registrations, missing/stale docs, and doc inaccuracies. Report only — doesn't fix anything.
 
 ### GSAP skills

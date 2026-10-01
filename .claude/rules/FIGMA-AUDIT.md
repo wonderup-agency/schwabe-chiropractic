@@ -2411,3 +2411,151 @@ Pablo marcó 4 cosas en la Home. Medido en el publicado con Playwright a 1440.
    En ≤991 la pill queda visible y el fondo transparente, porque en touch no
    hay hover. Vive en *Section / Find Us*, así que también aparece en Our Story.
    URL: `google.com/maps/search/?api=1&query=628+E+Evans+Ave+Suite+100+Denver+CO+80210`.
+
+### Home · mobile, 2026-10-01 (tarde)
+
+- **`#plan` a 390**: el número de 80px + 20 de gap dejaba 250px de texto en 350. A ≤767 el disco pasa a 48px y la columna de texto a 286. **La línea vertical vive en el estado *Before* de `.plan_steps`** (pseudo-elemento, `transform: scaleY(var(--plan-line, 1))` que anima `plan.js`), no en un elemento.
+- **El remate de los pasos era DM Sans italic**; el Figma dice EB Garamond Medium Italic 24px. La itálica no alcanza: hay que mirar la familia.
+- **Patrón general**: en mobile, todo "número + línea vertical" sigue a `#plan` — número en columna de 3rem, gap 1rem, línea centrada bajo el número. Aplicado a Four Things *Stacked* (New Patients) y *Stacked Light* (Injury). Los marcadores horizontales (Our Story `Columns Check`, Care Hub `#first-visit`) apilan centrados y **ocultan** la línea en mobile, y así quedan.
+- El método completo, los scripts y el catálogo de errores recurrentes están en la skill `/figma-parity`.
+
+
+## Our Story · #our-clinic y figma-parity, 2026-10-01
+
+Frame `1249:17334`. Fuente del cambio: comentario del cliente sobre `1249:17670`
+(*"slider for mobile; full grid for desktop"*) + `UPDATED_our-story-05-clinic-section-v0_1.md`
+(lead image + grid de 6 bloques, CMS, 2×3, orphans a la izquierda, alturas iguales).
+
+**Qué se construyó**
+
+- Colección **Clinic Features** `6abe699b252643c279a51bba`. Campos: Name (título),
+  Image `5c7b2fce…`, Body `b5ef819a…`, Sort Order `4d280d09…` (slug `sort-order`).
+  6 items con alt propio. Template `6abe699b252643c279a51bc0` en draft.
+- `section.section.cc-clinic` > `.container` > `.clinic_inner[data-component=clinic-slider]`
+  > Collection List `.clinic_list` > `.clinic_items` > `.clinic_item` > `.clinic_card`
+  (`.clinic_img`, `.clinic_body` > `h3.clinic_title` + `p.clinic_text`), y `.clinic_nav`
+  con dos `<button>` `.button.cc-slider-nav.cc-light` (`data-clinic="prev|next"`).
+- Sort por `sort-order` ascending. Orden verificado en el HTML publicado.
+
+**Medido en `webflow.io`**
+
+| Ancho | Layout | Card | Título |
+| --- | --- | --- | --- |
+| 1440 | 3 col, gap 40, filas de 514 | 427, foto 427×356 (6:5) | 22px |
+| 768 | 2 col, gap 24 | 340 | 22px |
+| 390 | fila deslizable (85%), scroll-snap | 298 | 20px |
+
+Padding: 80 arriba y abajo en desktop (Figma `py-80`), 48 / section padding en ≤991.
+
+**Aprendizaje del MCP (importante para otras páginas):** un Collection List
+**dentro de la definición de un componente** no tiene contexto CMS para el MCP:
+`get_bindable_sources` no lista los campos, el bind devuelve *"Element is not
+inside a CMS context"* y el sort *"No source connected"*, aunque `source` sí se
+guarda. Con el Designer conectado podría andar; sin él, el Collection List va a
+nivel página. Otro detalle: el MCP no deja insertar ni mover **entre** dos
+instancias (*"Cannot move an element before a component instance"*). Se resuelve
+con un div temporal al final de `main` como ancla: se mueven las instancias de
+abajo "before" del ancla y se borra.
+
+**Formatos de settings del Collection List que acepta el MCP**
+`source`: `{"collectionId": "…"}` · `sort`: `[{"fieldSlug": "sort-order", "direction": "ascending"}]`.
+
+**Deltas del resto de la página (no aplicados, para que Pablo elija)**
+
+| Section | Figma | Prod |
+| --- | --- | --- |
+| Hero | *don’t* con comilla tipográfica | comilla recta |
+| Story | card de cita ~420×200, itálica ~28px | 400×134, ~20px |
+| Bio | citas en Ink | citas en olive |
+| Four Things | botón píldora Beige + disco olive, 80px abajo | píldora olive apagada, ~50px |
+| The Space | H2 en 2 líneas (*care.* sola) | 1 línea con balance: lo pide el cliente, gana el cliente |
+| Clinic | slider 480×622 con título 32px | grid por pedido del cliente, título 22px por la nota de build |
+| Find Us | mapa 610×700, fondo claro | mapa más chico, fondo beige oscuro |
+| CTA | botones en una fila | el secundario baja |
+
+
+### Our Story · aplicado, 2026-10-01 (tarde)
+
+- `#our-clinic`: las 6 cards pasaron a **estáticas** (pedido de Pablo). La colección *Clinic Features* quedó sin uso, sin borrar.
+- Los 6 deltas de la tabla de arriba, aplicados y medidos (detalle por fila en TODO.md, bloque *Our Story · `#our-clinic` + figma-parity*).
+- Find Us: el Figma de la **Home** es beige oscuro con py 148 y el de **Our Story** claro con py 80, así que hay variante *Light* sólo para Our Story. El mapa 610×700 vale para las dos.
+- CTA Split: link secundario roto (`/about/community-partners`) corregido en el default del componente.
+
+
+## Our Team · Community Partners · Join Our Team, 2026-10-01
+
+Comparado section por section a escala 1 (hojas lado a lado) y aplicado lo que Pablo eligió (detalle en TODO.md).
+
+**Patrones nuevos que salieron**
+
+- **Contenedor de 1200 en las sections internas.** En Partners (*Rooted*) y en Join (*Philosophy*, *Openings*, *Standing*) el Figma pone el contenido en x120, 1200 de ancho; prod usaba los 1360 del container. Se resolvió con `max-width: 75rem` + margin auto en el grid de cada section, no tocando `.container`.
+- **El `Final CTA 1` del Figma no tiene un solo ancho de panel.** Our Story 831/529, Team y Partners 680/680. Por eso hay dos variantes: *Split* (50/50) y *Split Wide*.
+- **Títulos de hero con ancho propio por página** (480 en Partners, 631 en Join). Se manejan con el prop *Title Class* y utilities `u-max-width-*`.
+- **Links viejos `/about/*`**: aparecieron dos más (CTA secundario y botón de Kati). Ojo al revisar el resto.
+
+**Segunda pasada (re-check del mismo día):** 7 deltas más, aplicados (ver TODO). Patrón nuevo: el prop `Class` de Plain Text va al **wrapper** `.plain-text-component`, y la variante de tamaño vive en el `.plain-text` interno como `:where(.w-variant-…)`. Un combo en el wrapper no llega al tamaño desde el Designer; se resuelve redefiniendo la custom property de tipografía en el wrapper (`src/styles/plain-text.css`). El color sí hereda (ninguna regla de `.plain-text` declara `color`).
+
+**No aplicado:** credenciales de Frank (copy). Borde de las job cards y padding derecho del CTA de Team (48 vs 64) sin comparar.
+
+---
+
+## Pasada visual de los 13 frames restantes, 2026-10-01
+
+Section por section a escala 1, con hojas lado a lado (Figma | prod) y medición en las dos puntas (`get_design_context` + `getComputedStyle` a 1440). Reemplaza como fuente de verdad a la pasada de texto del 2026-09-25 para estas páginas. Hojas en el scratch de la sesión (no versionadas).
+
+**Notas viejas ya resueltas en prod:** Care `#approach` tiene foto y `#csw-bridge` ya va media a la izquierda · Injury dice *shoulder strains* · Contact ya no usa el placeholder de MAST · Products: el tag ya coincide · 404 ya dice *Back to home* · Blog: H2 *Expert guidance…* y aside *Important* ya están.
+
+### 🔴 Bugs (no son de Figma, verificados)
+
+1. **`/blog`: las 3 cards linkean a `detail_blog` → 404.** El `u-link-cover` quedó con texto literal en vez del link al item.
+2. **`/products-we-recommend` `#final-cta`: imagen rota (403)** — `…/webflow-prod-assets/…/6aa80d71e81270e66164d40c_team-growing-reception.png`.
+3. **Blog Post: *Share this post* invisible** — `.article-share_label` color `#FBFAF8` sobre `#FBFAF8`.
+4. **Blog Post *More from the practice*: incluye el artículo actual** (autolink).
+5. **Contact `#inquiry-form`: filas del form pegadas** — el `gap: 24px` está en `.w-form`, no en el `<form>`; textarea a 6px de la nota.
+6. **New Patients FAQ preview: 6 de 7 respuestas son Lorem ipsum.**
+
+### Patrones compartidos (aparecen en varias páginas)
+
+| Patrón | Figma | Prod | Dónde |
+| --- | --- | --- | --- |
+| Pregunta del accordion | EB Garamond 24, disco 32 borde `#d1d6c2`, abierto relleno olive | 20px, disco 28 borde ink 20% | FAQ, New Patients, Injury, Wellness |
+| Contenedor interno | 1200 en x120 | 1360 en x40 | casi todas las sections de texto |
+| Photo Band a sangre | 1440×1080 | 1440×860 | Care, Wellness, Patient Stories |
+| `#csw-bridge` / Shockwave | lockup logo 32 + *COLORADO SHOCKWAVE®*, botón con disco teal `#79979d` y ®, ® en el cuerpo | divisor + *ALSO AVAILABLE HERE*, sin flecha, sin ® | Care, Injury (además columnas invertidas y colores de card), Fees |
+| Eyebrow chico de asides/labels | DM Sans Medium 14 olive, tracking .56 | 16 ink | Injury, Wellness, Blog, Legal, Products |
+| Final CTA | variante Split (1360×560, foto a sangre 680) | `feature_card` (pad 60, foto inset 580×399) | Products, Wellness, FAQ (*Still have questions* además es banner sin foto en Figma) |
+| Fondo de la section del Final CTA | `#fbfaf8` | `#eeece4` | casi todas |
+| Blockquote del rich text | EB Garamond Medium Italic 24/1.3, borde 1px olive, px20 | default Webflow (DM Sans italic 20.8, borde 5px) | Patient Stories, Blog Post |
+| Article card | borde 2px `#cacdb7`, r24, p24, img 240 r16, título 24, sin botón | 1px, r12, p20, img 293, título 32, botón *Read more* | Blog, Blog Post |
+| Rich text H2 | 40px (H3) / 32 (H4) | 48 | Legal, Blog Post |
+| TOC | EB Garamond Medium 20, activo olive con disco | DM Sans 16 opacity .55, flecha a opacity 0, sangría 28 en inactivos | Legal, Blog Post |
+| Botón sin flecha | pill 48 con disco | 37 de alto sin icono | Contact *quick details*, Wellness `#fit`, Shockwave |
+| Apóstrofes rectos `'` | `’` | — | Care, Injury, New Patients, FAQ, Patient Stories |
+
+### Por página (lo específico, además de los patrones)
+
+**Care Hub** (`1249:12003`): `#first-visit` columnas con px40 interno, gaps 80/80 (prod 64/65), H2 680 de ancho (prod 900), glifo ✓ más fino · `#care-areas` ícono 160 (prod 120), domo 144 · *Learn more* 16px tracking .64 (prod 15) · card del medio oscura `#262f23` en Figma (¿hover o fijo?).
+
+**Injury** (`1249:12270`): `#care-approach` H2 662 en 2 líneas, pt160/pb100, números a opacity .5 · `#csw-bridge` media a la **derecha** en prod (Figma izquierda), sección `#eeece4` + card `#fbfaf8` sin borde r24, texto `#465659` · `#conditions-treated` cards con filete 24×2 `#728738` y texto EB Garamond 24 (prod 20 sin filete), H2 670 · `#faq` H2 440 · Final CTA sección `#fbfaf8`.
+
+**Wellness** (`1249:15030`): hero pt20 e imagen en x80 · `#recognition` 1200, pt160/pb120 · `#what-it-is` ícono 80 en domo 120×74, párrafos 18 · `#includes` fondo `#474c33` (prod `#262f23`), cards 584 gap 32, título 24/cuerpo 16 (prod 20/14) · `#options` eyebrow 14 olive, filas 54/62, precios Garamond Italic 24 (monthly ink 400, per-visit olive 600) vs prod 20/500 olive · nota al pie 680 de ancho · 💵 `$143` vs `$145` · `#fit` sin imagen y con otro layout [decisión] · *See all FAQ* oculto en Figma.
+
+**Fees** (`1249:14334`): la que más diverge. **Orden y contenido distintos** [decisión]: faltan *Three ways to pay* y *Medicare patients*; prod tiene *HSA and FSA.* que el Figma oculta; *The quick version* son 6 cards 3×2 en Figma vs 5 stat cards. Además: *Out-of-pocket* con colores invertidos (Figma claro) y aside *ADVANTAGE CONFIRMED*; *Appointment fees* fondo `#474d33`, tabla con nombre Garamond 24 y precio Garamond Italic 32, filas 91; *Payment methods* con foto a la izquierda y checklist [decisión]; *Cancellation* cards borde 2px, H3 32, cuerpo 16; copy *full visit fee* vs *full session fee*.
+
+**New Patients** (`1249:18150`): hero con la foto metida 60px en la sección oscura · *60-minute* fondo `#474d33` + textura, números en disco 80 `#555a43`, **falta el botón de reserva** · *After booking* review en card olive sobre la foto [decisión] · *Fees link* fondo `#eeece4` (prod `#d3dddf`), botón *See Fees & Practical Details* · video: radio 24, overlay + play 100 centrado · *Where we are*: títulos Garamond 24, cuerpo 18.
+
+**FAQ** (`1249:19487`): contenedor 1200 · nav 14px, pill activa borde 2px · primer ítem de cada categoría abierto · CTA de Shockwave como pill outline · ® · *Still have questions* banner sin foto, H2 60 [decisión].
+
+**Patient Stories** (`1249:23751`): hero foto 542×657 r24 y quote card Garamond Italic 32 · body 18 en hero/intro/outro/relationship · paddings 148 · featured sin foto con aside verde [decisión] · **faltan los disclaimers** (featured, relationship, themes, shockwave) · `#themes` lista vertical + título de tema [decisión] · shockwave con colores invertidos (Figma claro con texto `#465659`) y botón con disco teal · Google reviews eyebrow 14.
+
+**Blog** (`1249:23160`): hero con foto 720 a la derecha [decisión] · botón del hero con padding de más (falta `cc-icon-circle`) · intro 1200, aside label 14 olive · chips 14 borde 2px · H2 de la grilla 348 en 2 líneas.
+
+**Blog Post** (`1249:23553`): header y body arrancan en x120 · primer párrafo como heading Garamond 40 · imagen inline + caption [decisión, CMS] · newsletter vs free guide [decisión] · TOC con labels cortos [copy] · botones de share 34 borde 2px · Final CTA con copy propio del blog en prod.
+
+**Contact** (`1249:25161`): hero padding 120 y texto arriba, imagen 712×420, dirección 20px · borde del botón *Call* `rgba(202,205,183,.5)` · *Quick details* 1200, botón 48 con disco · mapa 1200×700 (prod 1360×1020 con PNG de 800 estirado, borroso) · *Accessibility* cuerpo 18 · form H2 60, 1200, form de 600.
+
+**Products** (`1249:26302`): hero con la imagen metida 60px en la sección siguiente, H1 569 · cita en itálica · **filtros** (6 chips con nombres reales) [decisión] · card 1200, imagen vertical 560×700 que llena el alto (prod deja ~300px vacíos), chip *Available in Clinic* blanco con punto verde, título 60, subtítulo Garamond Italic 24 · Final CTA Split.
+
+**Legales** (`1249:26662`, igual en las dos): hero oscuro `#262f23` con árbol y *Last modified* [decisión] · columna 800 en x120 · padding 120 · H2 40 con 40/24 de aire · aside de dirección en card `#eeece4` · pie con divisor + *Back to top ↑* · TOC Garamond 20 · card *Questions?* [decisión].
+
+**404** (`1249:26809`): gap titular itálico → párrafo 24 (prod 37). Prod usa `’`, Figma `'`: prod está mejor.
