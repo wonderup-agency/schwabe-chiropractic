@@ -28,6 +28,10 @@ Three jobs:
 4. Correct the `sizes` Webflow gives images inside the Image Fit component
    (always 800px), so the browser downloads a sharp enough srcset candidate.
    See src/utils/image-sizes.js.
+
+5. Make same-page #anchor links land below the sticky nav. Webflow's own
+   smooth scroll ignores scroll-margin and only offsets fixed headers.
+   See src/utils/anchor-scroll.js and src/styles/anchor-offset.css.
 */
 
 import '../styles/theme.css'
@@ -38,13 +42,16 @@ import '../styles/symptom-card.css'
 import '../styles/job-card.css'
 import '../styles/plain-text.css'
 import '../styles/announcement-offset.css'
+import '../styles/anchor-offset.css'
 import '../styles/registered.css'
 import { armFoucFailsafe } from '../utils/motion.js'
 import formatRegistered from '../utils/registered.js'
 import fixImageSizes from '../utils/image-sizes.js'
+import anchorScroll from '../utils/anchor-scroll.js'
 
 export default function () {
   armFoucFailsafe()
   formatRegistered()
   fixImageSizes()
+  anchorScroll()
 }

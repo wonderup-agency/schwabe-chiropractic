@@ -99,6 +99,34 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
   }
 }
 
+/* Hovering the button itself, inside a hovered card.
+
+   The card turns dark, so the Secondary's own hover (an olive wash with the
+   label back to Ink, from button.css) put dark text on a dark card: the label
+   disappeared exactly when the pointer was on it (reported 2026-10-02 on
+   /care). Inside an inverted card the button hovers like a Secondary on a
+   dark band instead: beige label, beige 12% wash. Done by re-pointing the
+   button's own hover variables, so button.css keeps the single hover rule. */
+[data-area-card][data-area-card]:focus-within [data-btn] {
+  --btn-fg-hover: var(--area-fg-hover);
+  --btn-bg-hover: color-mix(
+    in srgb,
+    var(--_color---brand--beige) 12%,
+    transparent
+  );
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-area-card][data-area-card]:hover [data-btn] {
+    --btn-fg-hover: var(--area-fg-hover);
+    --btn-bg-hover: color-mix(
+      in srgb,
+      var(--_color---brand--beige) 12%,
+      transparent
+    );
+  }
+}
+
 /* ── Reduced motion ────────────────────────────────────────────────────
    A state, not an off switch: the card still inverts, it just arrives
    instantly instead of fading. */

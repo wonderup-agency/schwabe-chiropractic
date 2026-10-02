@@ -46,12 +46,19 @@ an index — which is the article.
 }
 
 /* Below the two-column breakpoint the aside sits above the article in normal
-   flow, so a long index would push the first paragraph off the first screen. */
+   flow. It is not sticky there, so the active arrow never tracks anything:
+   drop the icon and its reserved slot, otherwise every item reads indented.
+
+   No border on the aside: the last .toc_link already draws the closing
+   hairline, and a second one 16px under it read as a double line
+   (Pablo, 2026-10-02, blog post at 390). */
 @media screen and (max-width: 991px) {
   [data-toc] {
-    border-bottom: 1px solid var(--_color---brand--divider-on-light);
     margin-bottom: 2rem;
-    padding-bottom: 1rem;
+  }
+
+  [data-toc-list] .toc-link_icon {
+    display: none;
   }
 }
 

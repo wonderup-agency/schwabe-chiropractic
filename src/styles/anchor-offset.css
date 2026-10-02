@@ -1,0 +1,29 @@
+/*
+Default landing offset for any anchor target.
+
+The nav is sticky (70px desktop, 63px mobile). Without an offset, a jump to
+#section puts its top under the nav. This default leaves the nav height plus
+some air. It is wrapped in :where() so it has zero specificity: anything set
+in the Designer (faq_category: 120px, to line up with the sticky FAQ sidebar)
+or in a component stylesheet (toc.css: 7rem) wins.
+
+scroll-margin (not scroll-padding on <html>) so the two never add up.
+Works for page loads with a hash natively, and for clicks through
+src/utils/anchor-scroll.js (Webflow's own scroll ignores it).
+*/
+
+:where([id]) {
+  scroll-margin-top: 6rem;
+}
+
+@media (max-width: 991px) {
+  :where([id]) {
+    scroll-margin-top: 5.5rem;
+  }
+}
+
+/* anchor-scroll.js focuses the target (tabindex="-1") so keyboard users
+   continue from there. It is a section, not a control, so it gets no ring. */
+:where([id][tabindex='-1']):focus {
+  outline: none;
+}

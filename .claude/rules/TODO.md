@@ -15,6 +15,16 @@ CDN del bundle: **`@970fb4b`** · último commit pusheado: **`d8553d2`**
 > es aplicar. Detalle en [FIGMA-AUDIT.md](FIGMA-AUDIT.md).
 
 
+## ❓ FAQ · lo que faltaba vs Figma + anchors — 2026-10-02
+
+| ✓ | Qué | Nota |
+| --- | --- | --- |
+| [x] | **Sin *All questions*** | Sacado del sidebar (en Figma el *View all* está oculto). Quedan las 6 categorías |
+| [x] | **Diagrama Evidence-Based Practice** | Faltaba en *Is chiropractic care evidence-based?*. Asset `6abfef2f11ddfff4518f4174` (webp 1254, del handoff: el de Figma tiene un punto rojo encima de "Evidence"). Agregado al rich text del CMS y publicado |
+| [x] | **CTA de Shockwave como pill** | Figma: pill Secondary chica, sin flecha. Sacada la " →" del CMS; el estilo lo da `accordion.css` (un `<div>` cuyo único hijo es un link dentro de la respuesta) ⏳ deploy |
+| [x] | **Anchors debajo de la nav** | webflow.js maneja los clicks en `#hash` y sólo descuenta headers `fixed`; la nav es `sticky`, así que todo caía en y=0. `src/utils/anchor-scroll.js` (captura el click y usa `scrollIntoView`, que respeta `scroll-margin`) + `src/styles/anchor-offset.css` (default `:where([id])` 96/88px). Medido: categorías de FAQ a 120 (su `scroll-margin` del Designer) en 1440/768/390, TOC del post a 112 ⏳ deploy |
+| [ ] | **Pill activa del sidebar** | Sigue a mano en el Designer (ver bloque de abajo) |
+
 ## 🧩 13 frames restantes · figma-parity + paddings mobile — 2026-10-01 (noche)
 
 Comparados section por section (detalle en [FIGMA-AUDIT.md](FIGMA-AUDIT.md), *"Pasada visual de los 13 frames restantes"*). Pablo eligió: los bugs, todos los patrones compartidos y todos los deltas por página que no son decisión de contenido. Publicado en `webflow.io`. `/responsive` (probe.js sobre `main`) en las 19 páginas: **OK en 12 perfiles** (sólo los links inline del rich text de FAQ y legales, conocidos). CDN en `@01eca79`: `cc-body` / `cc-meta` de `plain-text.css` ya están vivos (medido 16px y 14px).
@@ -24,6 +34,7 @@ Comparados section por section (detalle en [FIGMA-AUDIT.md](FIGMA-AUDIT.md), *"P
 | [ ] | **🔴 Bug · cards de /blog sin link al artículo** | ⚠️ NO resuelto: el MCP no logra el link *Current Blog* en un Collection List de página estática (`collectionPage` sin destino da `#`, con slug da el slug literal). **A mano en el Designer:** link block `u-link-cover` de la card en /blog → Link settings → *Current Blog*. Verificado 2026-10-02: hoy da `href="#"` |
 | [x] | **Ningún link al sitio viejo** · ✅ 2026-10-02: los 9 links a `coloradoshockwave.com` → `/blog/shockwave-therapy-plantar-fasciitis` (defaults de los botones de Shockwave en What Makes This Different, Colorado Shockwave, Shockwave Bridge y HSA FSA + 2 respuestas del FAQ en el CMS); *See more patient stories* de Patient Stories → `#themes`. Crawl de las 21 URLs: 0 links al sitio viejo. Ojo: el botón de Fees dice *See Colorado Shockwave pricing* y el artículo no tiene precios | — | — | — |
 | [ ] | **🔴 Imágenes pixeladas** · causa: el componente Image Fit sale con `sizes="(max-width: 800px) 100vw, 800px"` (Webflow no sabe el ancho dentro del componente y `sizes` es atributo reservado), así que el browser baja la variante de 800 aunque la foto se dibuje a 1440 en pantalla 2x. 43 de 85 imágenes grandes salían por debajo de 2x. ⏳ **deploy:** `src/utils/image-sizes.js` (en `global.js`) pone `sizes` = ancho real + ResizeObserver; probado inyectado: todas ≥2x. Además hay archivos chicos de origen para re-subir a ≥2880px: blog hero *longer appointments* (1448), `partners-platt-park-street` (1448), `south-denver-map-evans` (1220), `statement-texture` (1024), Shockwave de la Home (1672), `cost-of-waiting-ski` (1672), `new-patients-clinic-exterior` (1448), `CTA wellness` (1140) | — | — | — |
+| [ ] | **Care · hover del botón *Learn more* dentro de la card oscura** · ⏳ deploy: `src/styles/area-card.css` re-apunta `--btn-fg-hover`/`--btn-bg-hover` del botón cuando la card está en hover (label beige + wash beige 12%). Antes el hover del Secondary devolvía el texto a Ink sobre la card oscura y desaparecía. Probado inyectado | — | [/care#care-areas](https://schwabe.webflow.io/care#care-areas) | — |
 | [ ] | **🔴 Las 5 páginas /care/* dan 404** | back-neck-pain, headaches-tmj, plantar-fasciitis, prenatal-postpartum, wellness — el nav y el footer las linkean. Sólo existe sports-activity-overuse-injuries |
 | [x] | **Bug · foto rota del CTA de Products** | Feature Card reemplazada por CTA Banner *Split* (foto de recepción, `--img-pos: 0% 50%`) |
 | [x] | **Bug · *Share this post* invisible** y **autolink en *More from the practice*** | Label Ink 14; filtro *Name ≠ item actual* en el Collection List |
@@ -36,7 +47,7 @@ Comparados section por section (detalle en [FIGMA-AUDIT.md](FIGMA-AUDIT.md), *"P
 | [x] | **Por página** | Care, Injury, Wellness, Fees, NP, FAQ, Patient Stories, Contact, Products, 404: contenedores 1200, tamaños, fondos, paddings desktop, botones con disco, apóstrofes ’. Hero **Media Overlap** en Products y NP |
 | [x] | **Paddings de sección en tablet/mobile** | 40 mobile / 56 tablet en todas, hero 32/48, desktop sin cambios. Ver RESPONSIVE.md |
 | [ ] | **Hero sin barra de anuncio** | ⏳ deploy: `src/styles/announcement-offset.css` (ya importado en `global.js`). Sin barra: 24 mobile / 32 tablet. Probado inyectado |
-| [ ] | **TOC: sangría de los ítems inactivos** | ⏳ repo: `.toc_link:not(.cc-active) .toc-link_icon{display:none}` |
+| [x] | **TOC mobile: doble línea + sangría** | `toc.css` ≤991: sin `border-bottom` en `[data-toc]` (el último `.toc_link` ya cierra la lista) y sin el slot del ícono (ahí no es sticky, la flecha activa no sirve). Desktop sin cambios ⏳ deploy |
 | [ ] | **FAQ · borde de la pill activa** | A mano en el Designer: estado *Current* de `faq-nav_link` con borde 2px Brand Border (el MCP no crea `w--current`) |
 | [ ] | **Contact · mapa borroso** | Falta un asset de ~2400px; el `sizes` lo fija el componente Image Fit |
 | [ ] | **Botón LEARN MORE 16 / tracking .64** | Variable global `--_components---button--font-size`: decidir si cambia en todo el sitio |

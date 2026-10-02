@@ -68,3 +68,53 @@ details.accordion-component[open] > .accordion-trigger > .accordion-icon path {
     transition: none;
   }
 }
+
+/* ── Rich text inside an answer (FAQ CMS) ─────────────────────────────
+   Two things the Figma FAQ has that a rich text field can't carry on its own:
+
+   1. A lone link in its own block at the end of an answer is a CTA, not an
+      inline link ("Learn about Colorado Shockwave®"). Figma draws it as the
+      small Secondary pill (DM Sans 14 / 500 uppercase, 2px Brand Border,
+      r99). Editors can't add a class in the CMS, so the shape is the hook:
+      a block whose only child is a link. Inline links inside a <p> keep the
+      normal rich text style.
+   2. Images (the Evidence-Based Practice diagram) at Figma's size: 400px
+      max, square, 24px under the copy. Without `height: auto` the img keeps
+      its height attribute and stretches. */
+.accordion-content .w-richtext > div > a:only-child {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--_color---brand--border);
+  border-radius: 99px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--_color---brand--ink);
+  transition: background-color 160ms cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .accordion-content .w-richtext > div > a:only-child:hover {
+    background-color: color-mix(in srgb, var(--_color---brand--olive-green) 12%, transparent);
+  }
+}
+
+.accordion-content .w-richtext > div > a:only-child:focus-visible {
+  outline: 2px solid var(--_color---brand--olive-green);
+  outline-offset: 2px;
+}
+
+.accordion-content .w-richtext figure {
+  max-width: 25rem;
+  margin: 1.5rem 0 0;
+}
+
+.accordion-content .w-richtext figure img {
+  width: 100%;
+  height: auto;
+}
