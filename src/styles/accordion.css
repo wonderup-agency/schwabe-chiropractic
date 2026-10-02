@@ -100,7 +100,11 @@ details.accordion-component[open] > .accordion-trigger > .accordion-icon path {
 
 @media (hover: hover) and (pointer: fine) {
   .accordion-content .w-richtext > div > a:only-child:hover {
-    background-color: color-mix(in srgb, var(--_color---brand--olive-green) 12%, transparent);
+    background-color: color-mix(
+      in srgb,
+      var(--_color---brand--olive-green) 12%,
+      transparent
+    );
   }
 }
 

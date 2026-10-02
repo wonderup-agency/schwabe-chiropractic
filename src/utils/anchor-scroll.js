@@ -27,7 +27,8 @@ export default function anchorScroll() {
     'click',
     (event) => {
       if (event.defaultPrevented || event.button !== 0) return
-      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+        return
 
       const link = event.target.closest?.('a[href^="#"]')
       if (!link || link.closest(SKIP)) return
@@ -39,11 +40,19 @@ export default function anchorScroll() {
       event.preventDefault()
       event.stopPropagation()
 
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+      const reduce = window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+      ).matches
+      target.scrollIntoView({
+        behavior: reduce ? 'auto' : 'smooth',
+        block: 'start',
+      })
 
       if (location.hash !== `#${id}`) history.pushState(null, '', `#${id}`)
-      if (!target.hasAttribute('tabindex') && !target.matches('a, button, input, select, textarea')) {
+      if (
+        !target.hasAttribute('tabindex') &&
+        !target.matches('a, button, input, select, textarea')
+      ) {
         target.setAttribute('tabindex', '-1')
       }
       target.focus({ preventScroll: true })
