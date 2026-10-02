@@ -59,6 +59,9 @@ del Figma ampliado). **Mirá el hover** de cada botón con un mouse real
 | **Collection List dentro de un componente** | El MCP no ve los campos ni deja bindear | Ponerlo a nivel página (ancla temporal para moverlo entre instancias) |
 | **Section interna más angosta (1200)** | Figma con contenido en x120 y prod en x40 | `max-width: 75rem` + margin auto en el grid de la section |
 | **Tamaño de Plain Text por instancia** | El prop `Class` de Plain Text cae en el wrapper; la variante de tamaño está en el `.plain-text` interno | Prop string en el componente padre bindeado al `Class`, y la custom property `--_typography---<size>--font-size` redefinida en el wrapper desde `src/styles/plain-text.css` (requiere deploy). Color: combo en el wrapper, hereda |
+| **Final CTA con fondo por página** | El Figma cambia el fondo de la section del CTA según la página | Prop *Section Style* del CTA Banner (atributo `style` bindeado) |
+| **Tamaño tipográfico por instancia sin repo** | El prop `Style` de Plain Text / Eyebrow acepta custom properties inline | `--_typography---<size>--font-size: 0.875rem` en el prop Style |
+| **Padding de sección en mobile desparejo** | `pad.js 390,768,1440` | Token *Section / Padding* por modo (Tablet/Mobile); nunca px fijos en medium/small |
 | **Link interno a `/about/*`** | `grep` de `href="/about/` en el HTML publicado | Los slugs se movieron el 2026-09-27: `/our-story`, `/team`, `/community-partners` |
 
 ## 5. Trampas de medición

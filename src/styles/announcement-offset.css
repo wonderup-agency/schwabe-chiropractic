@@ -1,0 +1,33 @@
+/*
+Hero top when the announcement bar is gone
+
+The bar (`.announcement`, #announcement-bar) sits in the flow above the
+sticky nav. When the visitor dismisses it, the announcement script removes the
+element, and the nav moves up to y=0. The first section's padding-top did not
+change, so the air between the nav and the hero copy felt too big on phones.
+
+Webflow sets hero tops to 32 (mobile) / 48 (tablet) through the "Section /
+Padding Hero Top" variable. Without the bar we drop them to 24 / 32. Desktop
+stays untouched (matched to Figma, where there is no bar).
+
+`:is(#main, main)` matches any <main> but takes the id specificity, so it wins
+over the multi-class section combos (some pages have no id on <main>).
+`:has()` re-evaluates live, so this also applies right after the visitor
+dismisses the bar, with no JS. Browsers without `:has()` keep 32 / 48.
+
+Loaded from global.js, so it ships in dist/styles.css on every page.
+*/
+
+@media (max-width: 991px) {
+  body:not(:has(.announcement)) :is(#main, main) > section:first-child,
+  body:not(:has(.announcement)) :is(#main, main) > header:first-child {
+    padding-top: 2rem;
+  }
+}
+
+@media (max-width: 767px) {
+  body:not(:has(.announcement)) :is(#main, main) > section:first-child,
+  body:not(:has(.announcement)) :is(#main, main) > header:first-child {
+    padding-top: 1.5rem;
+  }
+}

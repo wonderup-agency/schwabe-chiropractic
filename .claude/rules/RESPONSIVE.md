@@ -1536,3 +1536,16 @@ hay hover que la revele.
 - Probe en las 3 páginas completas y `.cc-cta` en Home, New Patients, Our Story y Fees: OK en 12 perfiles.
 - `.partner_link` medía 27px de alto: min-height 2.75rem con el texto pegado abajo para no mover el subrayado.
 - CTA Split 50/50: a ≥1280 el panel es de 680; con padding derecho 3rem los dos botones de Team entran en una fila.
+
+
+## Paddings de sección en tablet/mobile · 2026-10-01
+
+Pedido de Pablo: *"a veces se ve como mucho espacio"*. Medido a 390: 7 valores distintos (50, 64, 80, 120, 148, 160 y 48/128 en el CTA). Decidido: **40 mobile / 56 tablet**, desktop sin cambios.
+
+- La colección **Components** ya tenía modos *Tablet* (≤991) y *Mobile* (≤767). **Section / Padding** vale 3.5rem en Tablet y 2.5rem en Mobile; Base sigue con el clamp.
+- Variables nuevas: **Section / Padding Hero Top** (3rem / 2rem), **Section / Padding Overlap** (7.5 / 5.5rem), **Section / Overlap Pull** (−4 / −3rem).
+- 59 combos de `.section` y 7 variantes de componente pasan al token en medium. Ceros intencionales y bandas chicas quedan.
+- Verificado con `pad.js`: 40 a 390 y 56 a 768 en todas; heroes 32/48; **0 diferencias a 1440** (129 secciones).
+- Efecto colateral: lo que usa el token por dentro (separadores `u-border`, spacer ×0.75, cost_intro/outro, space_detail) queda más compacto en ≤991.
+- **Regla:** nunca px fijos de padding de sección en medium/small; siempre el token.
+- Sin barra de anuncio: `src/styles/announcement-offset.css` baja el hero a 24/32 con `:has()` (requiere deploy).

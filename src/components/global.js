@@ -24,6 +24,10 @@ Three jobs:
    every page and has no hook in the Designer to hang off — and it has to be
    JS because CSS cannot target a character. The rule and the walk are in
    src/utils/registered.js.
+
+4. Correct the `sizes` Webflow gives images inside the Image Fit component
+   (always 800px), so the browser downloads a sharp enough srcset candidate.
+   See src/utils/image-sizes.js.
 */
 
 import '../styles/theme.css'
@@ -33,11 +37,14 @@ import '../styles/area-card.css'
 import '../styles/symptom-card.css'
 import '../styles/job-card.css'
 import '../styles/plain-text.css'
+import '../styles/announcement-offset.css'
 import '../styles/registered.css'
 import { armFoucFailsafe } from '../utils/motion.js'
 import formatRegistered from '../utils/registered.js'
+import fixImageSizes from '../utils/image-sizes.js'
 
 export default function () {
   armFoucFailsafe()
   formatRegistered()
+  fixImageSizes()
 }

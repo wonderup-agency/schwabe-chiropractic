@@ -2559,3 +2559,5 @@ Section por section a escala 1, con hojas lado a lado (Figma | prod) y medición
 **Legales** (`1249:26662`, igual en las dos): hero oscuro `#262f23` con árbol y *Last modified* [decisión] · columna 800 en x120 · padding 120 · H2 40 con 40/24 de aire · aside de dirección en card `#eeece4` · pie con divisor + *Back to top ↑* · TOC Garamond 20 · card *Questions?* [decisión].
 
 **404** (`1249:26809`): gap titular itálico → párrafo 24 (prod 37). Prod usa `’`, Figma `'`: prod está mejor.
+
+*Aplicado el mismo día salvo las decisiones de contenido; ver TODO.*

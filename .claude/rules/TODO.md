@@ -15,6 +15,34 @@ CDN del bundle: **`@970fb4b`** · último commit pusheado: **`d8553d2`**
 > es aplicar. Detalle en [FIGMA-AUDIT.md](FIGMA-AUDIT.md).
 
 
+## 🧩 13 frames restantes · figma-parity + paddings mobile — 2026-10-01 (noche)
+
+Comparados section por section (detalle en [FIGMA-AUDIT.md](FIGMA-AUDIT.md), *"Pasada visual de los 13 frames restantes"*). Pablo eligió: los bugs, todos los patrones compartidos y todos los deltas por página que no son decisión de contenido. Publicado en `webflow.io`. `/responsive` (probe.js sobre `main`) en las 19 páginas: **OK en 12 perfiles** (sólo los links inline del rich text de FAQ y legales, conocidos). CDN en `@01eca79`: `cc-body` / `cc-meta` de `plain-text.css` ya están vivos (medido 16px y 14px).
+
+| ✓ | Qué | Nota |
+| --- | --- | --- |
+| [ ] | **🔴 Bug · cards de /blog sin link al artículo** | ⚠️ NO resuelto: el MCP no logra el link *Current Blog* en un Collection List de página estática (`collectionPage` sin destino da `#`, con slug da el slug literal). **A mano en el Designer:** link block `u-link-cover` de la card en /blog → Link settings → *Current Blog*. Verificado 2026-10-02: hoy da `href="#"` |
+| [x] | **Ningún link al sitio viejo** · ✅ 2026-10-02: los 9 links a `coloradoshockwave.com` → `/blog/shockwave-therapy-plantar-fasciitis` (defaults de los botones de Shockwave en What Makes This Different, Colorado Shockwave, Shockwave Bridge y HSA FSA + 2 respuestas del FAQ en el CMS); *See more patient stories* de Patient Stories → `#themes`. Crawl de las 21 URLs: 0 links al sitio viejo. Ojo: el botón de Fees dice *See Colorado Shockwave pricing* y el artículo no tiene precios | — | — | — |
+| [ ] | **🔴 Imágenes pixeladas** · causa: el componente Image Fit sale con `sizes="(max-width: 800px) 100vw, 800px"` (Webflow no sabe el ancho dentro del componente y `sizes` es atributo reservado), así que el browser baja la variante de 800 aunque la foto se dibuje a 1440 en pantalla 2x. 43 de 85 imágenes grandes salían por debajo de 2x. ⏳ **deploy:** `src/utils/image-sizes.js` (en `global.js`) pone `sizes` = ancho real + ResizeObserver; probado inyectado: todas ≥2x. Además hay archivos chicos de origen para re-subir a ≥2880px: blog hero *longer appointments* (1448), `partners-platt-park-street` (1448), `south-denver-map-evans` (1220), `statement-texture` (1024), Shockwave de la Home (1672), `cost-of-waiting-ski` (1672), `new-patients-clinic-exterior` (1448), `CTA wellness` (1140) | — | — | — |
+| [ ] | **🔴 Las 5 páginas /care/* dan 404** | back-neck-pain, headaches-tmj, plantar-fasciitis, prenatal-postpartum, wellness — el nav y el footer las linkean. Sólo existe sports-activity-overuse-injuries |
+| [x] | **Bug · foto rota del CTA de Products** | Feature Card reemplazada por CTA Banner *Split* (foto de recepción, `--img-pos: 0% 50%`) |
+| [x] | **Bug · *Share this post* invisible** y **autolink en *More from the practice*** | Label Ink 14; filtro *Name ≠ item actual* en el Collection List |
+| [x] | **Bug · filas pegadas del form de Contact** | Clase nueva `inquiry_form-el` (flex, gap 24) en el `<form>`; Join no se toca |
+| [x] | **Accordion** | Size H5 (24) en las 24 instancias, ícono 32 Brand Border, fila 73, divisores Brand Border |
+| [x] | **Shockwave Bridge** | Lockup con marca teal + *Colorado Shockwave®*, botón `cc-icon-circle cc-slate` + `cc-circle-teal`. Variante nueva **Media Left Muted** (Injury) |
+| [x] | **Photo Band Full Bleed** | 1440×1080 (Care, Wellness, Patient Stories) |
+| [x] | **CTA Banner · prop *Section Style*** | `style` del section bindeado. Fondo beige en Injury, Fees, NP, Blog, Post y Wellness. Wellness y Products pasaron de Feature Card a CTA *Split* |
+| [x] | **Rich text / TOC / article card / legales** | H2 40, blockquote Garamond italic 24 borde 1px Olive, TOC Garamond 20, card r24 sin botón, legal 800+280 en x120, `legal_h2`, `legal_card`, pie con *Back to top* |
+| [x] | **Por página** | Care, Injury, Wellness, Fees, NP, FAQ, Patient Stories, Contact, Products, 404: contenedores 1200, tamaños, fondos, paddings desktop, botones con disco, apóstrofes ’. Hero **Media Overlap** en Products y NP |
+| [x] | **Paddings de sección en tablet/mobile** | 40 mobile / 56 tablet en todas, hero 32/48, desktop sin cambios. Ver RESPONSIVE.md |
+| [ ] | **Hero sin barra de anuncio** | ⏳ deploy: `src/styles/announcement-offset.css` (ya importado en `global.js`). Sin barra: 24 mobile / 32 tablet. Probado inyectado |
+| [ ] | **TOC: sangría de los ítems inactivos** | ⏳ repo: `.toc_link:not(.cc-active) .toc-link_icon{display:none}` |
+| [ ] | **FAQ · borde de la pill activa** | A mano en el Designer: estado *Current* de `faq-nav_link` con borde 2px Brand Border (el MCP no crea `w--current`) |
+| [ ] | **Contact · mapa borroso** | Falta un asset de ~2400px; el `sizes` lo fija el componente Image Fit |
+| [ ] | **Botón LEARN MORE 16 / tracking .64** | Variable global `--_components---button--font-size`: decidir si cambia en todo el sitio |
+| [ ] | **Decisiones de contenido** | Fees (orden, Medicare, Three ways, quick version, payment), Wellness `#fit` y **$143 vs $145**, NP review sobre la foto + **6 respuestas Lorem**, Patient Stories (featured sin foto, `#themes`, **disclaimers**, textura), Blog hero con foto, Post newsletter + imagen/caption + labels cortos del TOC, Products filtros, Legales hero oscuro + *Questions?*, FAQ *Still have questions* y CTA de Shockwave como botón (vive en el rich text del CMS) |
+| [ ] | **Esquema CMS nuevo** | Switch **Open by Default** en FAQs (abre la primera de cada categoría) |
+
 ## 👥 Our Team · Community Partners · Join Our Team — figma-parity 2026-10-01
 
 Frames `1249:17851`, `1249:17937`, `1249:26448`. Pablo eligió los deltas por poll. Publicado y medido. `/responsive` en las 3 páginas (todas sus sections) + `.cc-cta` en Home, New Patients, Our Story y Fees: **OK en 12 perfiles**.
