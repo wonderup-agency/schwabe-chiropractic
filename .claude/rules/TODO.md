@@ -15,6 +15,41 @@ CDN del bundle: **`@970fb4b`** · último commit pusheado: **`d8553d2`**
 > es aplicar. Detalle en [FIGMA-AUDIT.md](FIGMA-AUDIT.md).
 
 
+## 🧪 Pastel no ejecutaba los componentes JS — 2026-10-05
+
+| ✓ | Qué | Nota |
+| --- | --- | --- |
+| [x] | **Causa** | Pastel (proxy `webflow-io.proxy.usepastel.com`) re-ejecuta `main.js` con la página como base: los `import('./plan-xxxx.js')` se pedían a `schwabe.webflow.io/plan-xxxx.js` → 404, y el `catch` del loader lo tapaba (terser saca los `console.*`). Sin `global.js` ni GSAP: secciones con estado oculto anti-FOUC. GSAP/ScrollTrigger y el scroll de la ventana sí andan en Pastel |
+| [ ] | **Fix · falta build + deploy** | `scripts/rollup-absolute-chunks.js` (plugin nuevo, en `rollup.config.prod.js` y `.dev.js`): en la entry, `import('./x.js')` → `import(new URL('./x.js', __schwabeChunkBase()).href)`, con la base de `window.__devBase` (la misma que eligió el snippet del head). Fuera de Pastel la URL es idéntica. Probado con Playwright simulando Pastel: antes 0 ScrollTriggers y chunks 404, después 5 triggers, chunks 200 y el pin de `#plan` animando |
+| [ ] | **Borrar `_to_delete/.verify-build.mjs`** | Script de prueba que quedó en el repo (no se puede borrar desde la sesión) |
+
+## 🗂️ Feedback de Derek en Figma (25/9 al 2/10) · revisión contra staging — 2026-10-02
+
+Revisado contra schwabe.webflow.io (CDN `@4619aba`). Sólo diagnóstico, nada aplicado todavía.
+
+| ✓ | # | Qué falta | Nota |
+| --- | --- | --- | --- |
+| [ ] | 108 | **Footer: logo reversed** | Prod usa `logo-dark.svg` (círculo blanco). Figma (Carolina) ya tiene el reversed con el círculo marrón. Exportar SVG del nodo `1241-11132` o convertir `Schwabe_Chiro_Reversed_2_Horz_OTL.ai` (Drive/Logos) |
+| [ ] | 101 | **®: bug en `registered.js`** | La regla toma UN solo ® por página (el primero de cualquier marca). Donde CCSP® aparece antes, Colorado Shockwave queda sin ® (Home, Our Story, Team, Injury). Tiene que ser por marca. Además en la Home la primera mención (*Colorado Shockwave Available Here*) no trae ® en el texto fuente |
+| [ ] | 101 | **Home: eyebrow → logo horizontal 40–50px** | Hoy es `colorado-shockwave-mark-teal.png` 32px + texto. Hay `colorado-shockwave-logo.svg` en assets y `CoShockwave_Logo_Full_Color_Horz_OTL_2.ai` en Drive |
+| [ ] | 99/121/114 | **Final CTA con 0245** | OK: Home, Community Partners, Care Hub. Falta: Wellness (`CTA wellness.png`), Fees (`fees-cta-banner.png`), NP (**0249**), Patient Stories (`cta-sport.png`). ❓ Injury y Blog (cta-sport / trail) |
+| [ ] | 99 | **0249 sólo en el hero de Join** | También está en el CTA de NP y en `#community` de Our Story |
+| [ ] | 122 | **Crop de 0245 con los dos logos** | No se puede: el cartel de Colorado Shockwave está cortado en la foto original. En Home (840×560) se ve la foto entera |
+| [ ] | 119 | **Wellness: sacar la banda 0063 (1440×1080)** | Sigue. 0063 además se repite en el hero |
+| [ ] | 120 | **Wellness `#fit`: 0364 en rectángulo redondeado 4:3** | Hoy sin imagen. 0364 está en Drive (jpg 8.6MB), no en Webflow. Figma pendiente (Olha) |
+| [ ] | 114 | **Fees: página a v0.2** | Prod sigue en v0.1: badges numéricos en *quick version*, sección HSA/FSA (borrada en v0.2), sin *Care Structure* ni *Medicare*, orden viejo. El badge *Medicare: Not covered* no está en prod. Figma pendiente (Olha) |
+| [ ] | 115 | **Fees: foto 0264 con logo IA** | Prod: gráfico abstracto. En Drive sólo está la 0264 normal, no la versión *AI_logo_insert* |
+| [ ] | 103 | **Fees `#payment-methods`** | Sin imagen y heading centrado OK. El checklist son 3 columnas, no una columna angosta alineada a la izquierda |
+| [ ] | 118 | **Patient Stories: disclaimer** | No hay ningún disclaimer en prod. Va al final de *Want to hear from more patients?*. Falta el texto *short form* (el de Figma es el largo) |
+| [ ] | 117 | **Patient Stories: banda 0200 a la mitad** | Prod 1440×1080 |
+| [ ] | 116 | **Botón** *See more Colorado Shockwave patient stories →* | Prod: *See more patient stories* |
+| [x] | 110 | Hero de Patient Stories con 0018 | Ya usa 0018; la card tapa poco (rodilla) |
+| [x] | 109 | NP: testimonio fuera de la foto | Ya va debajo de la foto |
+| [ ] | 111 | **Our Story: retrato con color raro** | El asset `007_…(1).png` es **PNG indexado (modo P, 256 colores)** y 2880×2160 upscaleado: eso es el banding/tono. Subir una versión truecolor (el handoff es RGB 1448×1086) o la foto final |
+| [x] | 107 | Our Story `#our-clinic` | Grid 3 col desktop, Swiper en mobile, 6 fotos + placeholder Platt Park, copy igual al md. Pendientes viejos: retoque 0066, latas 0185, Innerscene |
+| [ ] | 112 | **Our Story `#community`: referencia mobile para el shoot del 16/10** | Hoy es CTA Split (foto arriba, texto abajo en mobile, nada encima de la foto). Mandarle a Derek captura 390 + proporciones. Usa 0249 (cambiar) |
+| [ ] | 113 | **Team CTA: puerta completa** | Prod 0206 recortada a 373×560, se corta el marco. La 0206 *AI_image_extend* está en Drive, no en Webflow |
+
 ## ❓ FAQ · lo que faltaba vs Figma + anchors — 2026-10-02
 
 | ✓ | Qué | Nota |

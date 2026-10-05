@@ -5,6 +5,7 @@ import resolve from '@rollup/plugin-node-resolve'
 import postcss from 'rollup-plugin-postcss'
 import postcssPresetEnv from 'postcss-preset-env'
 import commonjs from '@rollup/plugin-commonjs'
+import absoluteChunks from './scripts/rollup-absolute-chunks.js'
 
 function getPageEntries() {
   try {
@@ -51,6 +52,7 @@ export default defineConfig({
   plugins: [
     del({ targets: 'dist/*', runOnce: true }),
     checkGlobalJs(),
+    absoluteChunks(),
     resolve(),
     commonjs(),
     postcss({
