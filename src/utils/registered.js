@@ -3,7 +3,7 @@ El ® del sitio, formateado como lo pidió Derek.
 
 La regla, del comentario #101 de "Final review":
 
-  · ® SÓLO en la primera mención de texto de cada página
+  · ® SÓLO en la primera mención de texto de cada página, por marca
   · NUNCA en botones, y nunca en las menciones posteriores
   · ~60% del tamaño del texto
   · el tope aproximadamente a la cap height, no el glifo por defecto de la fuente
@@ -91,6 +91,30 @@ function collect(root) {
   return out
 }
 
+/**
+ * Qué marca lleva este ®. La regla de Derek es "primera mención de texto por
+ * página" POR MARCA: Colorado Shockwave® y CCSP® son menciones distintas. La
+ * versión anterior le daba un solo ® a toda la página, así que en la Home,
+ * Our Story, Team e Injury el CCSP® del doctor se quedaba con el lugar y
+ * Colorado Shockwave salía sin ® (revisión del 2026-10-05).
+ *
+ * La marca es la palabra (o el par "Colorado Shockwave") que va justo antes
+ * del ®. Si el ® ya venía en su propio <sup>, el texto está en el nodo previo.
+ */
+function markOf(node, sup) {
+  let before
+  if (sup) {
+    const prev = sup.previousSibling
+    before = prev ? prev.textContent : ''
+  } else {
+    before = node.nodeValue.slice(0, node.nodeValue.indexOf(CHAR))
+  }
+  before = before.trimEnd()
+  if (/shockwave$/i.test(before)) return 'colorado shockwave'
+  const word = before.match(/([\p{L}\p{N}&.-]+)$/u)
+  return word ? word[1].toLowerCase() : '?'
+}
+
 /** Saca un ® que ya venía como <sup>, sin perder texto si el sup traía más. */
 function dropSup(sup, node) {
   if (sup.textContent.trim() === CHAR) sup.remove()
@@ -108,11 +132,13 @@ export default function formatRegistered(root = document.body) {
     const found = collect(root)
       .map((node) => {
         const el = node.parentElement
+        const sup = el ? el.closest('sup') : null
         return {
           node,
           visible: !!el && isVisible(el),
           button: !!el && !!el.closest(BUTTONS),
-          sup: el ? el.closest('sup') : null,
+          sup,
+          mark: markOf(node, sup),
         }
       })
       .filter((m) => m.node.parentElement)
@@ -126,11 +152,17 @@ export default function formatRegistered(root = document.body) {
 
        Con el reclamante resuelto primero, las dos se evitan: lo oculto nunca
        reclama, pero igual se limpia. */
-    const claim = found.find((m) => m.visible && !m.button)
-    if (!claim) return // ninguna mención visible: no se toca nada
+    // Un reclamante por marca: la primera mención visible fuera de un botón.
+    const claims = new Set()
+    const seen = new Set()
+    for (const m of found) {
+      if (!m.visible || m.button || seen.has(m.mark)) continue
+      seen.add(m.mark)
+      claims.add(m)
+    }
 
     for (const m of found) {
-      if (m === claim) {
+      if (claims.has(m)) {
         if (m.sup) m.sup.classList.add(CLASS)
         else wrapFirst(m.node)
         continue

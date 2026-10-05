@@ -15,6 +15,27 @@ CDN del bundle: **`@970fb4b`** · último commit pusheado: **`d8553d2`**
 > es aplicar. Detalle en [FIGMA-AUDIT.md](FIGMA-AUDIT.md).
 
 
+## ✅ Feedback de Derek · aplicado por MCP — 2026-10-05
+
+Publicado en `webflow.io` y verificado con Playwright (1440 y 390).
+
+| ✓ | # | Qué | Nota |
+| --- | --- | --- | --- |
+| [x] | 108 | Footer con logo reversed | SVG exportado del Figma (`1410:14632`), asset `schwabe-logo-reversed.svg` en *Footer* |
+| [x] | 101 | Eyebrow de la card de Shockwave → logo horizontal | `colorado-shockwave-logo-horizontal.svg` (el SVG oficial sin el tagline *Activates Natural Healing*), `.shockwave-card_mark` 46px (40 en mobile); el Eyebrow de texto oculto |
+| [ ] | 101 | ® por marca | `src/utils/registered.js`: un reclamante por marca (`markOf`). Probado en Home, Our Story, Team, Injury, Fees, FAQ: CCSP® y Colorado Shockwave® cada uno en su primera mención, 0 en botones ⏳ deploy |
+| [x] | 99/121/114 | Final CTA con 0245 | Wellness, Fees, New Patients, Patient Stories |
+| [x] | 99 | 0249 sólo en Join | NP → 0245; Our Story `#community` → `partners-platt-park-street.png` (placeholder de Figma hasta la sesión del 16/10), `object-position: 30% 60%` |
+| [x] | 119 | Wellness sin la banda 0063 | Photo Band eliminado |
+| [x] | 117 | Patient Stories banda a la mitad | Variante nueva de Photo Band **Full Bleed Short** (`68f36e83…`): 1440/540, 2/1 en tablet, 3/2 en mobile |
+| [x] | 116 | Botón *See more Colorado Shockwave patient stories* | Sin ® |
+| [x] | 103 | Payment en columna angosta | `.payment_grid` 1 col, max 34rem centrada; `.payment_item` en fila, alineado a la izquierda; el último (*cash*) con opacidad .7 y una línea arriba |
+| [x] | 111 | Retrato de Our Story | Era PNG indexado (256 colores) agrandado. Ahora `007_dr-schwabe-reception.webp`: la foto original del Figma (4096px, convertida a sRGB) a 2880 |
+| [ ] | 113 | Team CTA con la 0206 AI extend | Falta el archivo: está en el Drive de Derek, no en Figma ni en Webflow |
+| [ ] | 118 | Disclaimer en Patient Stories | Falta el texto corto |
+| [ ] | 115 | 0264 con logo IA | El archivo no está en Drive |
+| [ ] | 120 / 114 | Wellness `#fit` con 0364 y Fees v0.2 | Esperan a Olha |
+
 ## 🧪 Pastel no ejecutaba los componentes JS — 2026-10-05
 
 | ✓ | Qué | Nota |
