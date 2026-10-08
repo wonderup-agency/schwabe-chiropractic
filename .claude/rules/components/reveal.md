@@ -31,6 +31,7 @@ elementos de adentro.
 | Atributo | Valores | Default |
 | --- | --- | --- |
 | `data-anim` | `mask` `words` `parallax` `parallax-media` `stagger` `rule` `fade` | — |
+| `data-anim-after` | `previous` (solo `fade`) | — — espera a que el `fade` anterior de la página TERMINE, después aplica su `data-anim-delay` |
 | `data-anim-delay` | segundos | `0` |
 | `data-anim-duration` | `quick` `base` `slow` `hero` | `slow` en `mask`, `base` en `words` |
 | `data-anim-distance` | `sm` `md` `lg` | `sm` (sólo `words`) |
@@ -56,9 +57,9 @@ instancia), salvo `cc-process` que es markup suelto de la página.
 | ″ | `.four_row` | `data-anim="stagger"` |
 | ″ | `.four_rule` | `data-anim="rule"` |
 | `Section / Photo Band`<br>`82a560e3-…` (5 instancias) | raíz | `data-component="reveal"` |
-| ″ | `.media-band_frame` | `data-anim="fade"` — **era `parallax-media` hasta el 2026-09-25** |
+| ″ | `.media-band_frame` | `data-anim="fade"` `data-anim-duration="slow"` `data-anim-start="top 70%"` — **era `parallax-media` hasta el 2026-09-25** |
 | `Section / Stories Outro`<br>`08741b21-…` (Patient Stories) | raíz | `data-component="reveal"` |
-| ″ | `.stories-intro_copy` | `data-anim="fade"` `data-anim-delay="0.2"` |
+| ″ | Block "Closing line (fade after image)" dentro de `.stories-intro_copy` (Stories Outro) | `data-anim="fade"` `data-anim-after="previous"` `data-anim-delay="0.2"` — antes el fade estaba en todo `.stories-intro_copy` (párrafo + kicker) |
 | `Section / The Space`<br>`16a05044-…` | raíz | `data-component="reveal"` |
 | ″ | `.space_frame` — **elemento nuevo** | `data-anim="parallax-media"` |
 | Care Hub, `#first-visit` | `section.cc-process` | `data-component="reveal"` |
@@ -523,3 +524,28 @@ El wrapper se creó para el parallax, pero **ya no es su única razón**: es la
 celda de grilla que usan las variantes `Split` y `Card Inset`, y su
 `overflow: hidden` es lo que recorta la foto contra el radio de 1rem en
 `Card Inset`. Borrarlo rompería las dos variantes.
+
+
+## Secuencia con `data-anim-after="previous"` (2026-10-08)
+
+La primera versión de la foto de signage + closing line encadenaba por posición
+de scroll + delay: cada uno tenía su trigger al 85%, así que la línea arrancaba
+cuando SU section entraba, sin relación con que la imagen hubiera terminado, y
+además fadeaba el párrafo entero. No se leía como "imagen, después la línea".
+
+Ahora:
+- La imagen (`.media-band_frame`) arranca al `top 70%` (antes 85%, se veía el
+  fade con el 15% de la imagen en pantalla) y dura `slow` (0.8s).
+- Solo la closing line tiene fade, envuelta en un Block propio.
+- `data-anim-after="previous"` hace que espere el `onComplete` del `fade`
+  anterior y después respete su `data-anim-delay` (0.2s). Si cuando entra en
+  vista la imagen ya terminó, arranca a los 0.2s. Si el líder nunca arrancó
+  (estaba en pantalla al init), no espera.
+- `fade` pasó de `EASE.out` a `EASE.soft`: motion-language.md asigna `soft`
+  a los fades de opacidad sola.
+- Sin promesas ni `delayedCall`: todo vive dentro del contexto de
+  `matchMedia`, el tween del follower se crea pausado y solo se hace `restart`.
+
+Medido 2026-10-08 (Playwright, bundle local sobre staging): 1440x900 y 390x844
+imagen 0→1 en ~0.8s; scroll rápido directo a la línea: imagen 0→1 en 0.8s y la
+línea arranca a ~1.0s. Sin errores de consola.

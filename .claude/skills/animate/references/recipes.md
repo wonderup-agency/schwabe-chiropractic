@@ -78,7 +78,7 @@ layout salta cuando el texto se reparte.
 
 ### Las variantes
 
-**`fade`** — `opacity` 0 → 1, sin travel. `EASE.soft`. Para logos, badges,
+**`fade`** — `opacity` 0 → 1, sin travel. `EASE.soft`. Con `data-anim-after="previous"` espera a que termine el `fade` anterior (ej. foto → closing line). Para logos, badges,
 imágenes de fondo, cualquier cosa donde el movimiento sería de más.
 
 **`fade-up` / `-down` / `-left` / `-right`** — el caballito de batalla.

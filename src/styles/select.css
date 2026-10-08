@@ -1,0 +1,53 @@
+/*
+Custom arrow for every Webflow Select field (.w-select), without an SVG.
+
+The native arrow renders differently per browser and ignores padding, so it
+is turned off with appearance: none and redrawn as a CSS chevron (two borders
+rotated 45deg). A <select> cannot have ::after, so the chevron lives on its
+wrapper: any element whose direct child is the select (e.g. .inquiry_field).
+
+Takes the wrapper's text color (currentColor). Nothing to add in the Designer:
+just keep the select inside its own field wrapper and delete any SVG/embed
+arrow that was there before.
+*/
+
+select.w-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none;
+  padding-right: 2.75rem;
+  cursor: pointer;
+}
+
+select.w-select::-ms-expand {
+  display: none;
+}
+
+:where(:has(> select.w-select)) {
+  position: relative;
+}
+
+:where(:has(> select.w-select))::after {
+  content: '';
+  position: absolute;
+  right: 1.125rem;
+  top: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-70%) rotate(45deg);
+  transition: transform 0.2s ease;
+  pointer-events: none;
+}
+
+:where(:has(> select.w-select:focus))::after {
+  transform: translateY(-30%) rotate(-135deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(:has(> select.w-select))::after {
+    transition: none;
+  }
+}

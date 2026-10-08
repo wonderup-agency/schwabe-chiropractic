@@ -723,3 +723,30 @@ Se poda cuando pasa de ~15 items. Para el historial completo está git.
 | [x] | **Los 31 `div` → `section`** y **22 de los 24 renames** | 2026-09-21 |
 | [x] | **38 sections componetizadas** — 93% de lo convertible | 2026-09-21 |
 | [x] | **El padding de las cards vivía en `small`** y el teléfono acostado es Tablet: la rampa quedó `desktop → 2rem (≤991) → 1.5rem (≤767)` | 2026-09-21 |
+
+## 🆕 Derek 3/10 · aplicado por MCP (2026-10-05)
+- [x] #125 Wellness `#what-it-is`: arch + icon at 2x (`.intro_dome.cc-wm` 15×9.25rem, new `.intro-dome_icon.cc-lg` 10rem), heading centered, copy left-aligned in a centered column (`.intro_copy.cc-left`).
+- [x] #126 Section / Four Things: new props `Show Care Icon` (bool) + `Care Icon` (image). Arch `.intro_dome.cc-four` = cream (all current variants are dark or stone). Turned on in Sports (icon-care-sports). **When the other care pages get built: enable the prop and pick their `icon-care-*.svg`.** If the section ever goes on a cream bg, add a stone combo.
+- [x] #115 Fees: shockwave image swapped to 0264 AI. The `$79` overlay wasn't legible over the new photo, so it got `.shockwave_price.cc-card` (cream card; on mobile it sits below the image).
+- [x] Team CTA → 0206 AI extend (object-position 100% 50%).
+- [ ] #123 Wellness hero → 0043. The Drive file (9MB) crashes the connector. Drop it in the repo or send a lighter one.
+- [x] #124 Blog Post disclaimer: inside Section / Article Body, between the rich text and "Share this post" (`.article_disclaimer` stone card, `.article_disclaimer-text`). Static text, the same on every post.
+- [x] #118 Patient Stories: at the end of Section / Google Reviews, `.stories-disclaimer` (hairline + centered small text). Includes the Figma disclaimer (it did not exist in Webflow) + the short version (#124 text). ⚠️ Partly redundant (both say "not a substitute..."), confirm with Derek whether the long one goes.
+- [ ] #120 Wellness `#fit` 0364 with all three people (mom visible). Waiting on Carolina/Olha.
+- [x] #122 no change (Derek keeps the crop).
+- [x] #119 #117 #116 #103 #108 were already applied in Webflow on 10/05.
+
+## 2026-10-08 · Patient Stories animation + maps + Fees vs Figma copy v0_2
+- [x] Maps → Google Business profile (maps/place/Schwabe+Chiropractic…), new tab: Find Us (Home, Our Story), Arrival Details (New Patients), Map Band (Contact; also removed a custom `href` attribute that was overriding the link). Published.
+- [x] Patient Stories signage animation (Derek): the fade now applies only to the closing line (Block "Closing line (fade after image)" inside Stories Outro), image `slow` + `top 70%`, new `data-anim-after="previous"` in reveal.js (waits for the image to finish + 0.2s), fade with `EASE.soft`. Webflow published. **JS pending deploy** (reveal.js). Until then, the old code still works with the new markup.
+- [ ] DEPLOY (Pablo): build + commit + push of `src/components/reveal.js`, `src/styles/select.css`, `src/components/global.js` and docs → bump hash in the Webflow head → publish.
+- [ ] Fees & Practical Details vs Figma "copy v0_2" (node 1562:6895, Derek #114). Section order in Figma: hero → quick version (list) → out-of-pocket → appointment fees → three ways to pay (NEW) → wellness membership → Colorado Shockwave → payment methods → Medicare patients (NEW) → cancellation → CTA. Deltas:
+  - Hero standfirst: "…and Medicare, with no surprises." (live has "…Medicare. No surprises. We would rather be direct than make you guess.")
+  - "The quick version." changes from 6 stat cards to a list: Insurance / HSA and FSA / Superbills / Medicare Part B / Payment / Colorado Shockwave (Figma text).
+  - Out-of-pocket: first paragraph rewritten ("Being out-of-network is a deliberate choice…"). The intro paragraph and the 4 chips do not appear in Figma.
+  - Fee table: "Focused Treatment Visit" / "Performance Treatment Visit" (live has "Session"). Adds "These are our pay-per-visit rates."
+  - NEW section "Three ways to pay for ongoing care." (Pay-per-visit / Care Package / Wellness Membership).
+  - Wellness: list adds "Family sharing on the 2- and 4-visit options" and "Discounted Colorado Shockwave treatment" (live has "sessions®"); cards without the family sharing sentence; note without "Good to know:". ⚠️ Ultimate Longevity 4 visits: Figma **$143** / live and Wellness page **$145**: confirm with Derek.
+  - The Colorado Shockwave card leaves the HSA section; HSA text moves to Payment methods ("If you plan to use HSA or FSA funds…").
+  - NEW section "Medicare patients" (Part B, What Part B covers, Maintenance, Advantage (Part C), Questions before you book).
+  - Cancellation: "charged at the full visit fee" (live has "session fee").

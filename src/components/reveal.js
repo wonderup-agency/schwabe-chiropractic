@@ -366,59 +366,89 @@ function buildRule(gsap, el) {
 /**
  * A plain opacity fade. No travel, no scrub, no parallax.
  *
- * Built 2026-09-25 for Derek's note on the Patient Stories photo band:
- * "the image fades in 0-100% slowly, then the closing line fades in shortly
- * after it settles. Subtle, no movement, no parallax. [...] And nothing
- * should be hidden by default, so the content still shows if the animation
- * doesn't fire."
+ * Built for Derek's note on the Patient Stories photo band: "the image fades
+ * in 0-100% slowly, then the closing line fades in shortly after it settles.
+ * Subtle, no movement, no parallax. [...] And nothing should be hidden by
+ * default, so the content still shows if the animation doesn't fire."
  *
  * That last sentence is a hard constraint, and it is why this is the only
  * variant on the site with NO anti-FOUC CSS — check reveal.css: the hidden
- * rule names its variants one by one and `fade` is deliberately absent. It
- * buys the failure mode Derek asked for (no GSAP means the content is simply
- * there) and it costs a flash: dist/styles.css lands before the first paint
- * and GSAP several frames later, so a blanket `set(opacity: 0)` here would
- * blink content the visitor is ALREADY LOOKING AT.
+ * rule names its variants one by one and `fade` is deliberately absent. No
+ * GSAP means the content is simply there. The cost is a possible flash, so
+ * only what is below the fold at init is hidden: something already on screen
+ * is left alone and never animates.
  *
- * The way out is to hide only what is below the fold at init. Something
- * already on screen has nothing to reveal, so it is left alone and never
- * animates; something below the fold is hidden before it could ever have
- * been seen, so no frame exists in which it blinks. Both halves of Derek's
- * constraint hold at once.
+ * Sequencing — `data-anim-after="previous"` (reworked 2026-10-08):
+ * the first version chained image and line by scroll position plus a delay.
+ * Each had its own trigger at 85%, so the line fired whenever ITS section
+ * arrived, unrelated to the image finishing — it never read as "then". Now a
+ * fade carrying `data-anim-after="previous"` waits for the previous `fade` on
+ * the page to COMPLETE, then plays after its own `data-anim-delay`. It still
+ * needs to be in view itself: if it arrives later than that, it plays when it
+ * arrives (plus delay). If the leader never started (it was on screen at init,
+ * or was skipped) the follower does not wait.
  *
- * Sequencing two of these is by scroll position plus `data-anim-delay`, NOT
- * by a shared timeline — the image and the closing line are separate
- * sections, and one timeline across both would need a grouping attribute the
- * contract does not have. Same call as the mask/words pairing.
+ * No promises and no delayedCall: anything created inside a .then() escapes
+ * the matchMedia context and mm.revert() would not undo it. The follower's
+ * tween is built here, paused, and only ever restarted.
  */
-function buildFade(gsap, el) {
+function buildFade(gsap, ScrollTrigger, el, fades) {
   const duration = readToken(el, 'data-anim-duration', DUR, DUR.base)
   const delay = readNumber(el, 'data-anim-delay', 0)
+  const follows = el.getAttribute('data-anim-after') === 'previous'
+  const leader = follows ? fades[fades.length - 1] || null : null
+
+  const entry = { started: false, done: false, waiters: [] }
+  const finish = () => {
+    entry.done = true
+    entry.waiters.splice(0).forEach((fn) => fn())
+  }
+  fades.push(entry)
 
   // Already on screen when the component initialises: nothing to reveal, and
   // hiding it now is the one thing this variant must never do.
   if (el.getBoundingClientRect().top < window.innerHeight) {
     gsap.set(el, { opacity: 1 })
+    entry.started = true
+    finish()
     return null
   }
 
-  return gsap.fromTo(
+  const tween = gsap.fromTo(
     el,
     { opacity: 0 },
     {
       opacity: 1,
       duration,
       delay,
-      ease: EASE.out,
-      scrollTrigger: {
-        trigger: el,
-        start: readStart(el),
-        once: SCROLL.once,
-        refreshPriority: refreshOrder(el),
-        markers: isDev(),
-      },
+      // Opacity-only: motion-language.md gives fades the soft curve.
+      ease: EASE.soft,
+      paused: true,
+      onComplete: finish,
     }
   )
+
+  const play = () => {
+    entry.started = true
+    tween.restart(true) // true = honour the delay
+  }
+
+  ScrollTrigger.create({
+    trigger: el,
+    start: readStart(el),
+    once: SCROLL.once,
+    refreshPriority: refreshOrder(el),
+    markers: isDev(),
+    onEnter: () => {
+      if (leader && leader.started && !leader.done) {
+        leader.waiters.push(play)
+      } else {
+        play()
+      }
+    },
+  })
+
+  return tween
 }
 
 // ── Registry ─────────────────────────────────────────────────────────
@@ -434,7 +464,8 @@ const BUILDERS = {
   'parallax-media': ({ gsap, el }) => buildParallax(gsap, el, { media: true }),
   stagger: ({ gsap, el }) => buildStagger(gsap, el),
   rule: ({ gsap, el }) => buildRule(gsap, el),
-  fade: ({ gsap, el }) => buildFade(gsap, el),
+  fade: ({ gsap, ScrollTrigger, el, fades }) =>
+    buildFade(gsap, ScrollTrigger, el, fades),
 }
 
 // Variants that cost a frame on every scroll tick, and are therefore capped.
@@ -507,6 +538,9 @@ export default function (elements) {
 
     mm.add(MQ.motionOk, () => {
       const splits = []
+      // Fades in document order, so data-anim-after="previous" can find its
+      // leader. Rebuilt on every matchMedia run.
+      const fades = []
       const isMobile = window.matchMedia(MQ.mobileDown).matches
       const hasPointer = window.matchMedia(MQ.hover).matches
 
@@ -528,7 +562,7 @@ export default function (elements) {
         }
 
         try {
-          build({ gsap, SplitText, el, splits })
+          build({ gsap, ScrollTrigger, SplitText, el, splits, fades })
         } catch (error) {
           // One malformed element must not take the rest of the page with it.
           console.error(`[${LABEL}] failed on`, el, error)
