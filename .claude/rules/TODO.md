@@ -42,7 +42,7 @@ Publicado en `webflow.io` y verificado con Playwright (1440 y 390).
 | --- | --- | --- |
 | [x] | **Causa** | Pastel (proxy `webflow-io.proxy.usepastel.com`) re-ejecuta `main.js` con la página como base: los `import('./plan-xxxx.js')` se pedían a `schwabe.webflow.io/plan-xxxx.js` → 404, y el `catch` del loader lo tapaba (terser saca los `console.*`). Sin `global.js` ni GSAP: secciones con estado oculto anti-FOUC. GSAP/ScrollTrigger y el scroll de la ventana sí andan en Pastel |
 | [ ] | **Fix v2 · falta build + deploy** | `afb9a7f` (v1, `import(new URL(…))`) tampoco anduvo: el proxy de Pastel reescribe cada `import(x)` a `import(_PastelEncodeProxyUrl(x,…))` y le saca los espacios, `new URL(` → `newURL(` (ReferenceError tapado por el loader). v2 en `scripts/rollup-absolute-chunks.js`: `import(window.__schwabeChunkUrl("./x.js"))`, sin `new` adentro del import y el helper en `window` para que terser no lo inline. Probado con Playwright imitando la reescritura de Pastel (incluido el bug): `afb9a7f` 0 chunks / 0 triggers (igual que en Pastel real), v2 chunks 200 y 5 triggers, `#plan` animando; sitio normal igual |
-| [ ] | **Borrar `_to_delete/.verify-build.mjs`** | Script de prueba que quedó en el repo (no se puede borrar desde la sesión) |
+| [x] | **Borrar `_to_delete/.verify-build.mjs`** | ✅ 2026-10-13: `_to_delete/` está en `.gitignore` y salió del repo. Los archivos siguen en el disco local (incluidos dos `.tgz` de 139MB que habían bloqueado el push: GitHub rechaza archivos de más de 100MB) |
 
 ## 🗂️ Feedback de Derek en Figma (25/9 al 2/10) · revisión contra staging — 2026-10-02
 
