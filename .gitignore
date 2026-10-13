@@ -7,3 +7,6 @@ scripts/dashboard/
 .claude/rules/DASHBOARD.md
 context
 playground/
+
+# Scratch files, never commit
+_to_delete/
