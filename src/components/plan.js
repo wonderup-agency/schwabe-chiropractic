@@ -3,13 +3,15 @@ Component: plan
 Webflow attribute: data-component="plan"
 
 The Home's `#plan` section ("Three steps to moving the way you want to again").
-On desktop the three steps behave as a scroll-driven accordion inside a pin:
-step one is open, and as the visitor scrolls each step hands over to the next.
+On desktop all three steps are fully open. The step nearest the middle of the
+screen is highlighted and the other two are dimmed but readable; the highlight
+moves 1 → 2 → 3 as the page scrolls normally. The photo stays sticky beside the
+steps. Clicking a step highlights it too.
 
-It is NOT an interactive accordion. There is no control to press, so it ships
-no <details>, no button and no aria-expanded — announcing a control that does
-not exist is worse than announcing nothing. The copy of all three steps stays
-in the DOM at all times; a closed step is clipped, never removed.
+Until 2026-10-13 this was a scroll-driven accordion inside a pin. Derek
+(Pastel #6) kept the one-step-at-a-time highlight and asked to drop the pin,
+so the page always scrolls normally. Nothing is collapsed any more: the copy
+of all three steps is always visible.
 */
 
 import './styles/plan.css'
@@ -30,30 +32,14 @@ import {
 const LABEL = 'plan'
 
 const PLAN = {
-  // Scroll the pin consumes. Five beats (hold, swap, hold, swap, hold) share it.
-  pin: '+=160%',
-  // Relative length of a beat where one step sits fully open, and of a
-  // hand-over. Units are arbitrary — a scrub normalises the timeline to the
-  // pin distance — so only their ratio matters.
-  hold: 1,
-  swap: 1,
-  // Where the stage parks. Not `top top`: the nav is sticky and ~70px tall,
-  // and a stage flush against it reads as if it collided with the header.
-  start: 'top 18%',
-  // The steps that are not being read. Low enough to recede, high enough that
-  // the copy is still legible to anyone who looks straight at it.
-  dim: 0.4,
-  // A click on a step scrolls to the point INSIDE the pin where that step is
-  // open instead of toggling state directly. That keeps click and scroll as
-  // ONE mechanism: no second source of truth to drift out of sync, and the
-  // scrub opens the step exactly as it would by hand.
-  clickToOpen: true,
-  // Pinned only where the grid is still two columns AND there is height for
-  // it. 992 and not 768: at `medium` .plan_grid collapses to one column, so
-  // media and steps stack and the stage grows past a tablet viewport. The
-  // height half is the usual guard — a landscape phone clears 768 wide and
-  // has 390px of height, most of which the sticky nav already owns.
-  pinnable: '(min-width: 992px) and (min-height: 600px)',
+  // The steps that are not being read. Derek: "dimmed but still readable".
+  dim: 0.45,
+  // How fast the highlight hands over. A state change, not a reveal.
+  swap: 0.35,
+  // Only where the grid is still two columns AND there is height for the
+  // sticky photo. At `medium` .plan_grid collapses to one column and the
+  // three steps simply enter, like on a phone.
+  highlight: '(min-width: 992px) and (min-height: 600px)',
 }
 
 /**
@@ -112,7 +98,7 @@ export default function (elements) {
     // The font wait sits OUTSIDE matchMedia: anything created inside a .then()
     // within a matchMedia handler escapes its context and mm.revert() will not
     // revert it. onceLaidOut, never whenLaidOut — the latter fires twice by
-    // design, which would build two pins on the same section.
+    // design, which would bind every trigger twice.
     onceLaidOut(() => {
       const mm = gsap.matchMedia()
 
@@ -124,7 +110,7 @@ export default function (elements) {
       // CSS `opacity: 0` until the 3s failsafe rescued them. Between motionOk
       // and reduced, one of the two is always true.
       const QUERIES = {
-        pinnable: PLAN.pinnable,
+        pinnable: PLAN.highlight,
         reduced: MQ.reduced,
         motionOk: MQ.motionOk,
       }
@@ -168,152 +154,90 @@ export default function (elements) {
           return
         }
 
-        // ── The pinned accordion ──────────────────────────────────────
+        // ── The highlight ─────────────────────────────────────────────
+        // Every step open and in flow; only the dim moves. Nothing changes
+        // height, so nothing below the section ever shifts.
+        gsap.set(details, { opacity: 1, clearProps: 'height' })
+        gsap.set(steps, { clearProps: 'height' })
 
-        // Natural heights of the three details, in px. Re-measured on every
-        // ScrollTrigger refresh because the copy reflows with the viewport.
-        let natural = []
-
-        /**
-         * Measure, then LOCK the column.
-         *
-         * The lock is the whole trick. A scroll-driven accordion that lets
-         * its container grow and shrink changes the height of the document
-         * underneath the visitor while they scroll, and the scroll position
-         * jumps. Fixing the column at "collapsed + the tallest single
-         * detail" means the height it needs is the height it always has, so
-         * the pin spacer never changes and nothing below it moves.
-         *
-         * Inline `height: auto` is how the natural size is read back: the
-         * collapsed state ships in CSS, so clearing the inline value would
-         * just re-apply `height: 0` and measure nothing.
-         */
-        const measure = () => {
-          gsap.set(details, { height: 'auto' })
-          natural = details.map((detail) => detail.offsetHeight)
-          gsap.set(details, { height: 0, opacity: 0 })
-          gsap.set(steps, { height: 'auto' })
-          gsap.set(steps, {
-            height: steps.offsetHeight + Math.max(...natural),
-          })
-          // t=0 of the timeline: the first step is the one being read.
-          gsap.set(details[0], { height: natural[0], opacity: 1 })
-          // The step itself is only ever revealed — the anti-FOUC CSS starts
-          // it at 0 — and the dim lives one level in, on the copy.
-          gsap.set(stepEls, { opacity: 1 })
-          gsap.set(dimTargets, { opacity: PLAN.dim })
-          gsap.set(dimTargets[0], { opacity: 1 })
-        }
-
-        measure()
-
-        const tl = gsap.timeline({
-          defaults: { duration: PLAN.swap, ease: EASE.inOut },
-          scrollTrigger: {
-            trigger: stage,
-            start: PLAN.start,
-            end: PLAN.pin,
-            pin: true,
-            scrub: SCROLL.scrub,
-            invalidateOnRefresh: true,
-            // Not optional. The Home pins `statement` above this and `cost`
-            // below it, components load through parallel dynamic imports and
-            // each waits on its own font promise, so creation order is a
-            // lottery. Higher refreshes sooner (gsap.com — the bundled
-            // ScrollTrigger skill states this backwards).
-            refreshPriority: refreshOrder(stage),
-            // Deliberately absent: anticipatePin. It brings the pin forward
-            // by the scroll velocity, and that head start is exactly an
-            // overlap with the section above.
-            onRefreshInit: measure,
-            markers: isDev(),
-          },
-        })
-
-        for (let i = 1; i < details.length; i += 1) {
-          const swap = `swap${i}`
-          tl.addLabel(swap, `+=${PLAN.hold}`)
-            .to(details[i - 1], { height: 0, opacity: 0 }, swap)
-            // Function-based so invalidateOnRefresh picks up the re-measure.
-            .to(details[i], { height: () => natural[i], opacity: 1 }, swap)
-            .to(dimTargets[i - 1], { opacity: PLAN.dim }, swap)
-            .to(dimTargets[i], { opacity: 1 }, swap)
-        }
-        // A final beat so the last step is readable before the pin lets go —
-        // without it the third step lands on the frame the pin releases.
-        tl.to({}, { duration: PLAN.hold })
-
-        // ── Click and keyboard ────────────────────────────────────
-        // Now that a step IS operable it has to say so. This is the one
-        // place the component departs from "scroll-driven, therefore not a
-        // control": there is a real control now, so it gets a real role, a
-        // real focus stop and real keyboard handling.
-        const cleanups = []
-        if (PLAN.clickToOpen) {
-          // Scroll position at which each step sits fully open, derived from
-          // the timeline so it follows any change to hold/swap.
-          const windows = stepEls.map((_, i) => {
-            const opens = i === 0 ? 0 : tl.labels[`swap${i}`] + PLAN.swap
-            const closes =
-              i === stepEls.length - 1
-                ? tl.duration()
-                : tl.labels[`swap${i + 1}`]
-            return (opens + closes) / 2
-          })
-
-          const scrollToStep = (i) => {
-            const st = tl.scrollTrigger
-            if (!st) return
-            const at =
-              st.start + (windows[i] / tl.duration()) * (st.end - st.start)
-            // Native smooth scroll, not ScrollToPlugin — that plugin is not
-            // loaded on this site (animations/PLUGINS.md), and the browser's
-            // own smooth scroll already honours reduced motion.
-            window.scrollTo({ top: at, behavior: 'smooth' })
-          }
-
-          stepEls.forEach((step, i) => {
-            if (!details[i].id) details[i].id = `plan-step-detail-${i + 1}`
-            step.setAttribute('role', 'button')
-            step.setAttribute('tabindex', '0')
-            step.setAttribute('aria-controls', details[i].id)
-            step.setAttribute('aria-expanded', i === 0 ? 'true' : 'false')
-
-            const onClick = () => scrollToStep(i)
-            const onKey = (event) => {
-              if (event.key !== 'Enter' && event.key !== ' ') return
-              event.preventDefault() // Space would scroll the page instead
-              scrollToStep(i)
-            }
-            step.addEventListener('click', onClick)
-            step.addEventListener('keydown', onKey)
-            cleanups.push(() => {
-              step.removeEventListener('click', onClick)
-              step.removeEventListener('keydown', onKey)
-              ;['role', 'tabindex', 'aria-controls', 'aria-expanded'].forEach(
-                (a) => step.removeAttribute(a)
-              )
+        let active = -1
+        const setActive = (next, instant = false) => {
+          if (next === active) return
+          active = next
+          dimTargets.forEach((el, i) => {
+            gsap.to(el, {
+              opacity: i === next ? 1 : PLAN.dim,
+              duration: instant ? 0 : PLAN.swap,
+              ease: EASE.inOut,
+              overwrite: true,
             })
           })
+          stepEls.forEach((step, i) =>
+            step.toggleAttribute('data-plan-active', i === next)
+          )
+        }
 
-          // aria-expanded has to follow the SCROLL too, not only the click, or
-          // a screen reader is told the wrong thing the moment someone scrolls
-          // past. One integer compare per frame; the DOM is touched only when
-          // the active step actually changes.
-          let active = -1
-          tl.eventCallback('onUpdate', () => {
-            const t = tl.time()
-            let next = 0
-            for (let i = 1; i < windows.length; i += 1) {
-              if (t >= tl.labels[`swap${i}`]) next = i
-            }
-            if (next === active) return
-            active = next
-            stepEls.forEach((step, i) =>
-              step.setAttribute('aria-expanded', i === next ? 'true' : 'false')
+        // The steps enter once, like everywhere else on the site.
+        gsap.fromTo(
+          stepEls,
+          { opacity: 0, y: DIST.sm },
+          {
+            opacity: 1,
+            y: 0,
+            duration: DUR.base,
+            ease: EASE.out,
+            stagger: STAGGER.base,
+            scrollTrigger: {
+              trigger: steps,
+              start: SCROLL.start,
+              once: SCROLL.once,
+              refreshPriority: refreshOrder(steps),
+              markers: isDev(),
+            },
+          }
+        )
+        setActive(0, true)
+
+        // "The step nearest the middle of the screen": each step owns the
+        // band where it crosses the viewport's centre line. Plain toggles, no
+        // scrub — the scroll is never held or slowed.
+        stepEls.forEach((step, i) => {
+          ScrollTrigger.create({
+            trigger: step,
+            start: 'top 55%',
+            end: 'bottom 55%',
+            refreshPriority: refreshOrder(steps),
+            onToggle: (self) => {
+              if (self.isActive) setActive(i)
+            },
+            markers: isDev(),
+          })
+        })
+
+        // ── Click and keyboard ────────────────────────────────────
+        // A step is now a real control (it changes the highlight), so it gets
+        // a role, a focus stop and keyboard handling. aria-pressed rather than
+        // aria-expanded: nothing opens, the copy is always visible.
+        const cleanups = []
+        stepEls.forEach((step, i) => {
+          step.setAttribute('role', 'button')
+          step.setAttribute('tabindex', '0')
+          const onClick = () => setActive(i)
+          const onKey = (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return
+            event.preventDefault() // Space would scroll the page instead
+            setActive(i)
+          }
+          step.addEventListener('click', onClick)
+          step.addEventListener('keydown', onKey)
+          cleanups.push(() => {
+            step.removeEventListener('click', onClick)
+            step.removeEventListener('keydown', onKey)
+            ;['role', 'tabindex', 'data-plan-active'].forEach((a) =>
+              step.removeAttribute(a)
             )
           })
-        }
+        })
 
         // The vertical hairline is a ::before on .plan_steps, and a pseudo
         // element is not a GSAP target. Driving a custom property the pseudo
@@ -336,12 +260,9 @@ export default function (elements) {
           }
         )
 
-        // matchMedia reverts its own tweens and triggers, but the locked
-        // height was written with gsap.set() outside any of them.
         return () => {
           cleanups.forEach((fn) => fn())
-          gsap.set(steps, { clearProps: 'height' })
-          gsap.set(details, { clearProps: 'height' })
+          gsap.set(dimTargets, { clearProps: 'opacity' })
         }
       })
     })

@@ -1,5 +1,7 @@
 # plan
 
+> **2026-10-13 · Pastel #6**: sin pin y nada colapsado. En desktop los 3 pasos abiertos; el más cercano al centro de la pantalla queda resaltado y los otros al 45%; la foto queda sticky; click resalta. Lo de abajo sobre el acordeón pineado es historia.
+
 ## Purpose
 
 La section `#plan` de la Home ("Three steps to moving the way you want to

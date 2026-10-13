@@ -1,5 +1,7 @@
 # nav
 
+> **2026-10-13 · Pastel #3**: hover (Ink + subrayado fino; fila del dropdown Beige Muted + Forest), sección actual con `[data-nav-current]` (Olive + subrayado 2px; también en páginas hijas; dropdown con rayita a la izquierda), y fix del cierre: el `hide()` de la timeline de cierre se disparaba aunque el usuario volviera a entrar. Ahora la timeline se guarda en `closing` y se mata al reabrir. `HOVER_LEAVE` 150 → 250ms.
+
 ## Purpose
 
 Owns two behaviours on MAST's nav.

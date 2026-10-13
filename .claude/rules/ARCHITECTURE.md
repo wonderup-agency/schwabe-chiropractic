@@ -153,3 +153,12 @@ Local dev → build → commit dist/ → push to GitHub → jsDelivr serves from
 
 The Webflow site loads assets directly from jsDelivr CDN at `@main`. During local development, the snippet in `webflow-snippet.html` points to `localhost:8080` with `@main` CDN as the production fallback. jsDelivr aggressively caches `@main` — changes propagate within minutes; use the jsDelivr purge API for immediate updates.
 
+
+### global.js · tel-links (2026-10-13)
+`src/utils/tel-links.js` runs from `global.js` on every page: it walks the text nodes in `<main>` and wraps the clinic phone number (720-432-9157 in its common formats) in `<a href="tel:+17204329157" class="u-tel">`. It skips anything already inside `a`, buttons or form fields. Reason: Plain Text props and CMS rich text can't carry a link mid-text (Pastel #19). The `.u-tel` class lives in Webflow (color inherit, underline).
+
+### global.js · lead-labels, equal-rows, focus, map (2026-10-13)
+- `src/utils/lead-labels.js`: bolds paragraph-start labels inside Plain Text (`LABELS`, today only "Good to know:", Pastel #15).
+- `src/utils/equal-rows.js` + `src/styles/equal-rows.css`: finds card grids in `<main>` (2+ siblings with the same class that have a border, fill or radius; skips sliders, marquees, forms, controls), groups them by row and gives each text block the height of the tallest one in its row; cards in a row stretch to the same height. Rows of one card (mobile) are left alone. Pastel #13/14/22.
+- `src/styles/focus.css`: one site-wide `:focus-visible` ring (olive 1.5px, 3px offset, rounded). Uses `!important` to beat MAST's per-class focus rules. Pastel #7.
+- `src/styles/map.css`: icon after "Open in Google Maps" (CSS mask instead of the ↗ that iOS renders as emoji) and z-order for the full-map link. Pastel #21.

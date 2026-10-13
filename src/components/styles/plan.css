@@ -21,24 +21,18 @@ has to be here, not only in gsap.set().
   opacity: 0;
 }
 
-/* ── The collapse ───────────────────────────────────────────────────
-   Scoped to exactly the viewports that get the pinned accordion, and that
-   scope is the accessibility argument for the whole feature: below 992px, or
-   on a short viewport, or with reduced motion, the three steps are simply
-   open and there is no window in which two thirds of the copy is hidden.
-   Most visits to a local clinic come from a phone, and a phone never sees
-   this rule.
-
-   No opacity here on purpose. `height: 0` plus the clip above already hides
-   the step; leaving opacity alone means the copy stays in the accessibility
-   tree and a screen reader still reads all three. */
-@media (min-width: 992px) and (min-height: 600px) and (prefers-reduced-motion: no-preference) {
-  [data-plan-detail] {
-    height: 0;
+/* ── The sticky photo ───────────────────────────────────────────────
+   Pastel #6: no pin and nothing collapsed. On desktop the photo rides along
+   beside the three open steps while the highlight moves 1 → 2 → 3. The top
+   offset clears the sticky nav (~70px) plus the announcement bar. */
+@media (min-width: 992px) and (min-height: 600px) {
+  [data-plan-stage] {
+    align-items: start;
   }
 
-  [data-plan-step]:first-child [data-plan-detail] {
-    height: auto;
+  [data-plan-stage] .plan_media {
+    position: sticky;
+    top: 8rem;
   }
 }
 
@@ -76,24 +70,17 @@ html.anim-failsafe [data-plan-detail] {
 }
 
 /* ── The click affordance ───────────────────────────────────────────
-   Scoped to exactly the branch that wires the handlers. Below 992px, on a
-   short viewport, or with reduced motion the steps are already open and
-   `plan.js` attaches nothing — so a pointer cursor there would promise an
-   interaction that does not exist. */
+   Only where plan.js wires the handlers (desktop, motion OK). */
 @media (min-width: 992px) and (min-height: 600px) and (prefers-reduced-motion: no-preference) {
   [data-plan-step][role='button'] {
     cursor: pointer;
-
-    /* A step is a control, so its label is not text to select. Without this a
-       double-click highlights a word AND fires the handler twice — measured on
-       the FAQ accordion on 2026-09-23, where it read as "it opens and closes".
-       Only inside this branch: where no handler is attached the text stays
-       selectable, because there it is just copy. */
+    /* A double-click must not select a word AND fire the handler twice. */
     user-select: none;
   }
 
   [data-plan-step][role='button']:focus-visible {
     outline: 2px solid currentColor;
     outline-offset: 4px;
+    border-radius: 0.5rem;
   }
 }

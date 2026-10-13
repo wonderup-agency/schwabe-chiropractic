@@ -2,72 +2,37 @@
 Component: statement
 Webflow attribute: data-component="statement"
 
-The "You do not need another guess." section. Pins for one viewport and reveals
-both headlines word by word, out of a blur, scrubbed to the pin.
+The "You do not need another guess." section. The two headlines fade in when
+they enter the viewport: timed, not tied to scroll, the second line a beat
+after the first, played once.
 
-Full rationale, tuning history and the measurements behind every number:
-.claude/rules/components/statement.md
+Until 2026-10-13 the section pinned for a viewport and scrubbed the words out
+of a blur. Derek (Pastel #5) asked to drop every pin so the page always
+scrolls normally, and made "timed fade on enter, once" the rule for every
+scroll animation on the site. History: .claude/rules/components/statement.md
 */
 
 import './styles/statement.css'
 import {
-  DUR,
   DIST,
   EASE,
-  STAGGER,
-  SCROLL,
   MQ,
   getGsap,
   getPlugin,
   onceLaidOut,
-  refreshOrder,
   isDev,
 } from '../utils/motion.js'
 
 const STATEMENT = {
-  // Extra scroll the pin holds AFTER the last word lands, as a share of the
-  // viewport. The pin's total length is `revealIntoPin + hold`, so at 0 it
-  // releases the moment the sentence is complete.
-  //
-  // It used to be a flat `pin: '+=100%'`, which was 0.6 of a viewport —
-  // ~540px at 900 tall — of scrolling with the sentence already finished and
-  // nothing left to animate. Reported as wanting to keep scrolling once the
-  // text is in. Deriving the length from `revealIntoPin` instead of hard-
-  // coding it is what stops the two drifting apart again: raise
-  // `revealIntoPin` and the pin follows.
-  hold: 0,
-  // Where the words start appearing, as a share of the viewport height from
-  // the top. 0.7 means "when the section's top reaches 70% down the screen" —
-  // i.e. while it is still rising, before it reaches the top.
-  //
-  // The reveal is a SEPARATE trigger from the pin on purpose: ScrollTrigger
-  // pins the element wherever it is when the trigger starts, so a single
-  // trigger starting early would freeze the section mid-screen. Two triggers
-  // is the only way to have the reveal begin before the pin does.
-  //
-  // Calibrated by measuring, not guessing: the text sits centred in a 100dvh
-  // section, roughly 450px below its top edge. At 0.7 the trigger fired while
-  // the text was still below the fold, so the first word was fully opaque
-  // with the section 220px short of the top — it read as "already done"
-  // rather than "arriving". 0.35 puts the start right as the text clears the
-  // bottom edge.
-  revealStart: 0.35,
-  // How much of the pin the reveal keeps running for, 0–1. Without this the
-  // words would all be in before the pin even starts, leaving the whole pin
-  // static.
-  revealIntoPin: 0.4,
-  // Starting blur on each word, in px.
-  blur: 8,
-  // Where the second headline starts relative to the first, 0–1 of its own
-  // duration. At 0.5 the second begins while the first is ~60% through, which
-  // is what makes the two read as one gesture instead of two blocks.
-  overlap: 0.5,
+  // Derek: "about 400 to 600ms, second line slightly after the first".
+  duration: 0.55,
+  delay: 0.15,
+  // A light blur keeps the old "coming into focus" feel without the scrub.
+  blur: 6,
+  // The headlines sit centred in the section, so wait until they are well
+  // inside the viewport rather than firing on the section's top edge.
+  start: 'top 80%',
 }
-
-// Pinning needs height, not just width. A phone on its side (844×390) lands in
-// Webflow's Tablet breakpoint and would pass a bare min-width: 768px, but the
-// sticky nav already takes 70px of those 390. See .claude/rules/RESPONSIVE.md
-const PINNABLE = '(min-width: 768px) and (min-height: 600px)'
 
 /**
  * @param {HTMLElement[]} elements - All elements matching [data-component='statement']
@@ -76,178 +41,53 @@ export default function (elements) {
   if (!elements.length) return
 
   // The failsafe in global.js has to survive a missing GSAP, so nothing above
-  // this point may touch window.gsap. A bare gsap.registerPlugin() at the top
-  // of the module throws ReferenceError and takes the whole module with it.
+  // this point may touch window.gsap.
   const gsap = getGsap('statement')
   if (!gsap) return
 
   const ScrollTrigger = getPlugin('ScrollTrigger', 'statement')
-  const SplitText = getPlugin('SplitText', 'statement')
-  if (!ScrollTrigger || !SplitText) return
+  if (!ScrollTrigger) return
 
-  gsap.registerPlugin(ScrollTrigger, SplitText)
+  gsap.registerPlugin(ScrollTrigger)
 
-  // Fonts first, matchMedia second. Opening the matchMedia inside the font
-  // promise instead would put every tween outside the context mm.revert()
-  // cleans up, and the pin would survive a breakpoint change.
   onceLaidOut(() => {
     const mm = gsap.matchMedia()
 
     elements.forEach((wrapper) => {
       // MAST's Heading is a ComponentInstance and Webflow rejects attributes
-      // on those ("This element does not support attributes"), so the hook is
-      // one attribute on the container and the lines are its direct children —
-      // the same shape reveal.js uses for data-anim="stagger".
+      // on those, so the hook is one attribute on the container and the lines
+      // are its direct children.
       const linesBox = wrapper.querySelector('[data-statement-lines]')
       if (!linesBox) return
       const lines = Array.from(linesBox.children)
       if (!lines.length) return
 
-      // Reduced motion is a state, not an off switch: same end state, no
-      // travel, no blur, no pin.
       mm.add(MQ.reduced, () => {
         gsap.set(lines, { opacity: 1, y: 0, filter: 'blur(0px)' })
       })
 
-      mm.add(
-        {
-          canPin: `${PINNABLE} and ${MQ.motionOk}`,
-          motionOk: MQ.motionOk,
-        },
-        (ctx) => {
-          if (!ctx.conditions.canPin) {
-            // No pin: a plain entrance, once, no blur and no scrub.
-            gsap.fromTo(
-              lines,
-              { opacity: 0, y: DIST.md },
-              {
-                opacity: 1,
-                y: 0,
-                duration: DUR.base,
-                ease: EASE.out,
-                stagger: STAGGER.loose,
-                scrollTrigger: {
-                  trigger: wrapper,
-                  start: SCROLL.start,
-                  once: SCROLL.once,
-                  markers: isDev(),
-                },
-              }
-            )
-            return
-          }
-
-          // type: 'words' with no mask. A mask wrapper has overflow: clip and
-          // would shear the blur, which bleeds outside the word's box.
-          // aria defaults to 'auto': the label goes on the container and every
-          // word gets aria-hidden, so a screen reader reads the whole sentence.
-          const splits = []
-          const wordsPerLine = []
-
-          lines.forEach((line) => {
-            const split = SplitText.create(line, { type: 'words' })
-            splits.push(split)
-            wordsPerLine.push(split.words)
-            // The container was hidden by the anti-FOUC CSS; the words inside
-            // it were not, because they did not exist when that CSS applied.
-            // So hand the hiding over: container on, words off.
-            //
-            // This set is not redundant with the fromTo below. A fromTo placed
-            // later in a timeline does not render its start values until the
-            // playhead reaches it, so the second headline's words stayed fully
-            // visible until the scroll got to them — measured at opacity 1
-            // through the whole approach.
-            gsap.set(line, { opacity: 1 })
-            gsap.set(split.words, {
-              opacity: 0,
-              filter: `blur(${STATEMENT.blur}px)`,
-            })
-          })
-
-          // The reveal. Starts while the section is still rising and keeps
-          // running into the first part of the pin, so the visitor never sees
-          // the empty band: by the time the section lands, the words are
-          // already arriving. Created before the pin trigger so the two
-          // refresh in page order.
-          const tl = gsap.timeline({
+      mm.add(MQ.motionOk, () => {
+        gsap.fromTo(
+          lines,
+          { opacity: 0, y: DIST.sm, filter: `blur(${STATEMENT.blur}px)` },
+          {
+            opacity: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            duration: STATEMENT.duration,
+            ease: EASE.out,
+            stagger: STATEMENT.delay,
+            // Hand the filter back so a stray blur(0) doesn't keep a layer.
+            clearProps: 'filter',
             scrollTrigger: {
-              trigger: wrapper,
-              start: `top ${STATEMENT.revealStart * 100}%`,
-              end: () =>
-                `+=${
-                  window.innerHeight *
-                  (STATEMENT.revealStart + STATEMENT.revealIntoPin)
-                }`,
-              scrub: SCROLL.scrub,
-              invalidateOnRefresh: true,
-              refreshPriority: refreshOrder(wrapper),
+              trigger: linesBox,
+              start: STATEMENT.start,
+              once: true,
               markers: isDev(),
             },
-          })
-
-          // The pin. No animation of its own — it holds the sentence on
-          // screen while the words arrive, then releases.
-          //
-          // The length is derived, not fixed: the reveal finishes exactly
-          // `revealIntoPin` into the pin, so anything past that is scroll
-          // where the sentence is already complete and nothing moves. `hold`
-          // buys a deliberate beat there if one is ever wanted; at 0 the pin
-          // lets go the moment the last word lands.
-          ScrollTrigger.create({
-            trigger: wrapper,
-            start: 'top top',
-            end: () =>
-              `+=${
-                window.innerHeight * (STATEMENT.revealIntoPin + STATEMENT.hold)
-              }`,
-            pin: true,
-            pinSpacing: true,
-            invalidateOnRefresh: true,
-            refreshPriority: refreshOrder(wrapper),
-            markers: isDev(),
-          })
-
-          // No travel on the scrubbed branch — opacity and blur only.
-          //
-          // A scrubbed tween has no duration of its own: its progress is the
-          // visitor's scroll. DIST.sm is 12px, and spread over the ~360px of
-          // scroll one word occupies that is 0.03px per pixel scrolled — far
-          // too slow to read as movement, and plenty to read as the text
-          // never settling. Measured: it drifted upward the whole way down.
-          //
-          // `linear` alone only made the drift uniform, it did not remove it.
-          // Travel belongs to tweens that own their duration; the no-pin
-          // branch above still uses it. Here blur carries the gesture — it
-          // has no position for the eye to anchor to, so it reads as coming
-          // into focus rather than as layout moving.
-          wordsPerLine.forEach((words, i) => {
-            tl.fromTo(
-              words,
-              {
-                opacity: 0,
-                filter: `blur(${STATEMENT.blur}px)`,
-              },
-              {
-                opacity: 1,
-                filter: 'blur(0px)',
-                duration: DUR.base,
-                ease: EASE.linear,
-                stagger: STAGGER.tight,
-              },
-              i === 0 ? 0 : `<${STATEMENT.overlap * 100}%`
-            )
-          })
-
-          // matchMedia reverts the tweens and the trigger on its own, but the
-          // split rewrote the DOM and has to be undone by hand — revert the
-          // instances we kept, never a fresh one.
-          return () => {
-            splits.forEach((split) => split.revert())
-            splits.length = 0
-            wordsPerLine.length = 0
           }
-        }
-      )
+        )
+      })
     })
   })
 }

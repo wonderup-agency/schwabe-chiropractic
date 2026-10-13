@@ -1,5 +1,7 @@
 # statement
 
+> **2026-10-13 · Pastel #5**: sin pin. Las dos líneas hacen fade al entrar al viewport (0.55s, la segunda +0.15s, una vez). Derek lo pidió como regla para toda animación de scroll del sitio. Lo de abajo sobre pin y scrub es historia.
+
 ## Purpose
 
 La section `cc-statement` ("You do not need another guess."). Se pinea por un

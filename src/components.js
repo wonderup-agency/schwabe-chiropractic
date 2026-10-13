@@ -57,4 +57,12 @@ export default [
     selector: "[data-component='clinic-slider']",
     importFn: () => import('./components/clinic-slider.js'),
   },
+  {
+    selector: "[data-component='symptoms']",
+    importFn: () => import('./components/symptoms.js'),
+  },
+  {
+    selector: "[data-component='guide-download']",
+    importFn: () => import('./components/guide-download.js'),
+  },
 ]

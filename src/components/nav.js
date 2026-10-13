@@ -28,7 +28,7 @@ const PANEL = {
 }
 
 const HOVER_ENTER = 120 // ms of intent before the first panel opens
-const HOVER_LEAVE = 150 // ms of grace before closing on mouse-out
+const HOVER_LEAVE = 250 // ms of grace before closing on mouse-out
 
 const SHIFT = 10 // px of sideways travel when switching between panels
 const DROP = 6 // px the panel falls in from on a cold open
@@ -76,6 +76,8 @@ function collectDropdowns(nav) {
 }
 
 function initNav(nav, gsap) {
+  markCurrentSection(nav)
+
   const mm = gsap.matchMedia()
 
   // Dropdowns — desktop only, and only if this nav has any.
@@ -99,6 +101,59 @@ function initNav(nav, gsap) {
   mm.add({ reduce: MQ.reduced, ok: MQ.motionOk }, (context) => {
     const { reduce } = context.conditions
     return bindScrolledState({ nav, gsap, reduce })
+  })
+}
+
+// ── Current section ──────────────────────────────────────────────
+/*
+Webflow only puts w--current on the link whose href is exactly this page.
+Derek wants the whole section lit: the About / Care / New Patients toggle on
+every page of its dropdown, and Patient Stories on every story (CMS detail
+pages under /patient-stories/…). So: a top-level link is current when the path
+equals its href or sits under it; a dropdown toggle is current when any of its
+links is. Marked with [data-nav-current]; nav.css owns the look.
+*/
+const normalize = (path) => path.replace(/\/+$/, '') || '/'
+
+function isCurrent(href, path) {
+  if (!href) return false
+  let target
+  try {
+    const url = new URL(href, window.location.origin)
+    if (url.origin !== window.location.origin) return false
+    target = normalize(url.pathname)
+  } catch {
+    return false
+  }
+  if (target === '/') return path === '/'
+  return path === target || path.startsWith(target + '/')
+}
+
+function markCurrentSection(nav) {
+  const path = normalize(window.location.pathname)
+  const menu = nav.querySelector('.nav-menu') || nav
+
+  menu.querySelectorAll('.nav-dropdown').forEach((dropdown) => {
+    const toggle = dropdown.querySelector('.w-dropdown-toggle')
+    const links = Array.from(dropdown.querySelectorAll('.w-dropdown-list a'))
+    // Exact match wins inside the dropdown (/care must not light up on
+    // /care/back-neck-pain when that page has its own link).
+    let hit = links.find(
+      (a) =>
+        isCurrent(a.getAttribute('href'), path) &&
+        normalize(new URL(a.href).pathname) === path
+    )
+    if (!hit) hit = links.find((a) => isCurrent(a.getAttribute('href'), path))
+    if (!hit) return
+    hit.setAttribute('data-nav-current', '')
+    if (toggle) toggle.setAttribute('data-nav-current', '')
+  })
+
+  menu.querySelectorAll('a.nav-link:not(.cc-dropdown-link)').forEach((a) => {
+    if (isCurrent(a.getAttribute('href'), path)) {
+      a.setAttribute('data-nav-current', '')
+      a.setAttribute('aria-current', 'page')
+    }
   })
 }
 
@@ -219,6 +274,11 @@ function bindDesktop({ nav, dropdowns, gsap, reduce }) {
   let openIndex = -1
   let enterTimer = null
   let leaveTimer = null
+  // The close timeline ends in a hide() callback. killTweensOf() doesn't
+  // reach timeline callbacks, so without killing the timeline itself a quick
+  // leave-and-return reopened the panel and then the stale hide() fired and
+  // shut it again (Pastel #3).
+  const closing = new Map()
 
   const listeners = []
   const on = (target, type, fn, options) => {
@@ -251,6 +311,7 @@ function bindDesktop({ nav, dropdowns, gsap, reduce }) {
 
   // `direction` is -1, 0 or 1 — the axis the panel leaves along.
   function closePanel(d, direction) {
+    closing.get(d)?.kill()
     gsap.killTweensOf(parts(d))
     d.toggle.setAttribute('aria-expanded', 'false')
 
@@ -268,13 +329,19 @@ function bindDesktop({ nav, dropdowns, gsap, reduce }) {
     if (d.caret) {
       tl.to(d.caret, { rotation: 0, duration: t(PANEL.caret) }, 0)
     }
-    tl.add(() => hide(d))
+    tl.add(() => {
+      closing.delete(d)
+      hide(d)
+    })
+    closing.set(d, tl)
   }
 
   function open(index) {
     if (index === openIndex) return
 
     const d = dropdowns[index]
+    closing.get(d)?.kill()
+    closing.delete(d)
     const previous = openIndex >= 0 ? dropdowns[openIndex] : null
     // 0 on a cold open (drop down), ±1 when moving between siblings.
     const direction = previous ? Math.sign(index - openIndex) : 0
@@ -331,8 +398,11 @@ function bindDesktop({ nav, dropdowns, gsap, reduce }) {
     leaveTimer = null
     clearTimeout(enterTimer)
     // Once something is open, switching is immediate — the delay only
-    // guards against opening a menu the user is passing over.
-    enterTimer = setTimeout(() => open(index), openIndex >= 0 ? 0 : HOVER_ENTER)
+    // guards against opening a menu the user is passing over. Coming back
+    // into a panel that is still fading out counts as "open" too: it snaps
+    // back instead of waiting for the intent delay.
+    const warm = openIndex >= 0 || closing.has(dropdowns[index])
+    enterTimer = setTimeout(() => open(index), warm ? 0 : HOVER_ENTER)
   }
 
   function handleLeave() {
@@ -443,6 +513,8 @@ function bindDesktop({ nav, dropdowns, gsap, reduce }) {
   // so nothing leaks into the mobile navbar.
   return () => {
     clearTimers()
+    closing.forEach((tl) => tl.kill())
+    closing.clear()
     listeners.forEach(([target, type, fn, options]) =>
       target.removeEventListener(type, fn, options)
     )

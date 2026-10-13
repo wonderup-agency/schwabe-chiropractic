@@ -1,5 +1,7 @@
 # cost
 
+> **2026-10-13 · Pastel #26**: sin pin y sin cortina. Las 4 frases se suman y quedan las 4 en pantalla (stagger 0.2s, una vez), igual que en mobile. Banda con alto máximo de un viewport y scrim fijo 0.35. Lo de abajo sobre pin, cortina y parallax es historia.
+
 ## Purpose
 
 La section `cc-cost` ("The cost of waiting"). Se pinea por ~3 viewports y cuenta

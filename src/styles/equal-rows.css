@@ -1,0 +1,4 @@
+/* Cards in a row share a height (src/utils/equal-rows.js, Pastel #13). */
+[data-eq-card] {
+  align-self: stretch;
+}

@@ -1,0 +1,71 @@
+/*
+Focus indicator — Pastel #7 (Derek, 2026-10-09)
+
+"Keep a visible focus indicator for accessibility, but style it to match the
+design rather than the default box. Thin olive outline with rounded corners and
+a small offset from the text, shown only for keyboard users. It shouldn't
+overlap or butt against the dropdown border. Same style on buttons and links
+site-wide."
+
+- :focus-visible only, so a mouse click never draws it.
+- One rule for every interactive element. MAST and the Designer ship a dozen
+  per-class focus rules (orange, -2px offsets, 2px widths); the !important is
+  how one site-wide style wins over all of them without chasing each one,
+  since this file's position relative to Webflow's CSS isn't ours to control.
+- MAST buttons are a div.button with an invisible a.u-link-cover on top, so
+  focus lands on the cover. The ring goes on the button (pill radius) via
+  :has(), and the cover itself draws nothing.
+- Dropdown items: the panel has 0.375rem of padding (nav.css), so a 2px
+  offset ring sits inside the panel and never touches its border.
+*/
+
+:root {
+  --focus-ring-color: var(--_color---brand--olive-green, #6b744e);
+  --focus-ring-width: 1.5px;
+  --focus-ring-offset: 3px;
+  --focus-ring-radius: 0.375rem;
+}
+
+:is(
+  a,
+  button,
+  summary,
+  select,
+  input,
+  textarea,
+  [role='button'],
+  [tabindex]
+):focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color) !important;
+  outline-offset: var(--focus-ring-offset) !important;
+  border-radius: var(--focus-ring-radius);
+  box-shadow: none !important;
+}
+
+/* Webflow's dropdown toggle is a div with tabindex, and the w-* rules zero
+   its outline on :focus. */
+.w-dropdown-toggle:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color) !important;
+  outline-offset: var(--focus-ring-offset) !important;
+  border-radius: var(--focus-ring-radius);
+}
+
+/* Inside the dropdown panel: tighter, so it stays clear of the panel border. */
+.w-dropdown-list a:focus-visible {
+  outline-offset: 2px !important;
+}
+
+/* Buttons: the ring follows the pill, not the invisible cover link. */
+.button:has(> .u-link-cover:focus-visible) {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.button > .u-link-cover:focus-visible {
+  outline: none !important;
+}
+
+/* Mouse and touch: never a ring. */
+:focus:not(:focus-visible) {
+  outline: none;
+}

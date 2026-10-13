@@ -34,3 +34,61 @@ The chip's resting and active styling lives in the Designer (.filter-chip and
     transition-duration: 0s;
   }
 }
+
+/*
+Patient Stories · "What patients notice." filters — Pastel #18 (2026-10-09)
+
+- Every chip gets a light pill outline so it reads as a button, not plain
+  text; the selected one is filled (Forest Green, beige text).
+- Mobile: one horizontally scrolling row instead of three uneven ones. The
+  row bleeds to the screen edges so the last chip shows cut off, which is
+  the hint that there is more.
+- Mobile: less air between the intro paragraph and the chips.
+Scoped to .themes_filter so the Blog chips keep their own style.
+*/
+.themes_filter .filter-chip {
+  border-color: var(--_color---brand--border-strong, #cacdb7);
+}
+
+.themes_filter .filter-chip.cc-active {
+  border-color: var(--_color---brand--forest-green, #262f23);
+  background-color: var(--_color---brand--forest-green, #262f23);
+  color: var(--_color---brand--beige, #fbfaf8);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .themes_filter .filter-chip:not(.cc-active):hover {
+    border-color: var(--_color---brand--olive-green, #6b744e);
+    background-color: var(--_color---brand--beige, #fbfaf8);
+  }
+}
+
+@media (max-width: 767px) {
+  .cc-themes .stories-center {
+    margin-bottom: 1.5rem;
+  }
+
+  .themes_filter {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    /* Bleed past the container padding to the screen edges. */
+    margin-inline: calc(50% - 50vw);
+    padding-inline: max(1rem, calc(50vw - 50%));
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 1rem;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .themes_filter::-webkit-scrollbar {
+    display: none;
+  }
+
+  .themes_filter .filter-chip {
+    flex: none;
+    scroll-snap-align: start;
+    white-space: nowrap;
+  }
+}

@@ -740,7 +740,7 @@ Se poda cuando pasa de ~15 items. Para el historial completo está git.
 - [x] Maps → Google Business profile (maps/place/Schwabe+Chiropractic…), new tab: Find Us (Home, Our Story), Arrival Details (New Patients), Map Band (Contact; also removed a custom `href` attribute that was overriding the link). Published.
 - [x] Patient Stories signage animation (Derek): the fade now applies only to the closing line (Block "Closing line (fade after image)" inside Stories Outro), image `slow` + `top 70%`, new `data-anim-after="previous"` in reveal.js (waits for the image to finish + 0.2s), fade with `EASE.soft`. Webflow published. **JS pending deploy** (reveal.js). Until then, the old code still works with the new markup.
 - [ ] DEPLOY (Pablo): build + commit + push of `src/components/reveal.js`, `src/styles/select.css`, `src/components/global.js` and docs → bump hash in the Webflow head → publish.
-- [ ] Fees & Practical Details vs Figma "copy v0_2" (node 1562:6895, Derek #114). Section order in Figma: hero → quick version (list) → out-of-pocket → appointment fees → three ways to pay (NEW) → wellness membership → Colorado Shockwave → payment methods → Medicare patients (NEW) → cancellation → CTA. Deltas:
+- [x] Fees & Practical Details vs Figma "copy v0_2" (node 1562:6895, Derek #114). Section order in Figma: hero → quick version (list) → out-of-pocket → appointment fees → three ways to pay (NEW) → wellness membership → Colorado Shockwave → payment methods → Medicare patients (NEW) → cancellation → CTA. Deltas:
   - Hero standfirst: "…and Medicare, with no surprises." (live has "…Medicare. No surprises. We would rather be direct than make you guess.")
   - "The quick version." changes from 6 stat cards to a list: Insurance / HSA and FSA / Superbills / Medicare Part B / Payment / Colorado Shockwave (Figma text).
   - Out-of-pocket: first paragraph rewritten ("Being out-of-network is a deliberate choice…"). The intro paragraph and the 4 chips do not appear in Figma.
@@ -750,3 +750,58 @@ Se poda cuando pasa de ~15 items. Para el historial completo está git.
   - The Colorado Shockwave card leaves the HSA section; HSA text moves to Payment methods ("If you plan to use HSA or FSA funds…").
   - NEW section "Medicare patients" (Part B, What Part B covers, Maintenance, Advantage (Part C), Questions before you book).
   - Cancellation: "charged at the full visit fee" (live has "session fee").
+  - DONE 2026-10-08 (Webflow, published to webflow.io, verified at 1440/390 with Playwright plus a text diff): all deltas above applied. New components: `Section / Payment Options` (21a5b50c), `Section / Medicare` (86cf3c11, a duplicate of Practice Philosophy, `section.cc-medicare` stone, `philosophy_body.cc-medicare` gap 2.25rem, `medicare_item` H3/H5 + body). Payment Methods: 4 `ph-check-square` items (new prop Item 4), intro hidden, `.intro_dome.cc-payment` with no dome, `payment_item` align start with no faded last-child. Sections reordered to match Figma.
+  - [ ] Confirm with Derek: Ultimate Longevity 4 visits $143 (Figma) vs $145 (live, kept).
+  - [ ] Confirm with Derek: the Shockwave Fees button still points to /blog/shockwave-therapy-plantar-fasciitis (should it go to coloradoshockwave.com?).
+  - [ ] Not replicated: "Good to know:" in bold (Plain Text has no inline formatting) and coloradoshockwave.com as an inline link in the Shockwave body.
+
+## 2026-10-08 · Thank You page (Free Guide form)
+- [x] `/thank-you` page (6ac7e5dd379600fd636e5ed8) duplicated from the 404: numeral hidden, H1 "Thank you. Your guide is ready.", paragraph, "Download the guide" button (Primary, id `guide-download`, new tab) + "Back to home". Published, verified at 1440/390.
+- [x] `Section / Free Guide` form: Redirect URL `/thank-you`, name "Free Guide Form" (applies on every page that uses the component).
+- [ ] PDF: upload the guide to Assets and link it on the "Download the guide" button (it is `#` today). Delivery agreed with Pablo: automatic download on submit, the thank you page is only a landing, no email.
+- [ ] Thank you copy written by us (placeholder): Derek should validate it.
+- [ ] SEO: mark `/thank-you` as noindex (Page settings > custom code `<meta name="robots" content="noindex">`) and exclude it from the sitemap. Can't be done via MCP.
+- [x] 2026-10-08 · Guide auto-download: new `guide-download` component (`src/components/guide-download.js`, registered in `components.js`). The form leaves a flag on submit, `/thank-you` downloads the PDF via blob (the CDN has CORS `*`). Attributes set in Webflow (form: `data-guide="form"` + `data-redirect="/thank-you"`; landing: `.error_content` `data-guide="landing"`). Thank you copy: "…is downloading now. If it didn't start, use the button below." Doc: `components/guide-download.md`.
+- [ ] DEPLOY (Pablo): `guide-download.js` + `components.js` go in the same build as reveal.js/select.css. Without the deploy the form already redirects but nothing downloads.
+- [ ] End-to-end test (real submit → redirect → download) once the PDF is uploaded and linked on the `#guide-download` button.
+
+## 2026-10-13 · Pastel, second batch (the rest)
+
+Everything below is code in the repo (**pending build + deploy**) unless it says Webflow. Tested with the local bundle routed over staging, 1440 and 390.
+
+| ✓ | # | What | Where | Doc |
+| --- | --- | --- | --- | --- |
+| [ ] | 3 | Nav: hover (Ink + thin underline; dropdown row Beige Muted + Forest text), current section (Olive + 2px underline on About/Care/New Patients/Fees/Patient Stories/Contact, also on child pages; dropdown: Olive + short line on the left), close delay fixed (a stale `hide()` from the close timeline fired after re-entering) | site-wide | [nav.md](components/nav.md) |
+| [ ] | 5 | Statement: no pin. Timed fade on enter (0.55s, second line +0.15s, once) | Home | [statement.md](components/statement.md) |
+| [ ] | 26 | Cost of waiting: no pin, no curtain. The 4 lines build up and stay (0.2s stagger, once). Band capped at one viewport, scrim 0.35 | Home | [cost.md](components/cost.md) |
+| [ ] | 6 | Steps: no pin, all 3 open, the step nearest the centre highlighted (others 45%), sticky photo, click highlights | Home | [plan.md](components/plan.md) |
+| [x] | 4 | **Webflow**: Sound Familiar now has the 7 Figma cards (H3 `symptoms_lead` + `symptoms_trigger`, dark card `symptoms_card.cc-dark`), one `.marquee-group`, `data-component="symptoms"` on the marquee. Published to staging | Home | [symptoms.md](components/symptoms.md) |
+| [ ] | 4 | Code: `symptoms.js` (rAF loop, clones, drag/swipe/trackpad, pause on hover/focus, pause/play button, reduced motion = manual only, equal lead heights). ⚠️ Until the deploy staging runs MAST's CSS marquee on a single group (visible jump at the end of the loop) | Home | [symptoms.md](components/symptoms.md) |
+| [ ] | 7 | Focus ring: olive 1.5px, radius, 3px offset, keyboard only; buttons ring the pill; dropdown items stay inside the panel → `src/styles/focus.css` | site-wide | — |
+| [ ] | 13/14/22 | Card rows aligned (titles/descriptions per row + equal card height, only with 2+ cards per row) → `src/utils/equal-rows.js` + `equal-rows.css`. Checked on Home, Fees, Wellness, Care, Patient Stories, Team, Partners, Back & Neck, Blog | site-wide | — |
+| [ ] | 18 | Patient Stories filters: outline on every chip, active filled Forest; mobile one scrolling row bleeding to the edge, less gap above → `filter.css` | Patient Stories | [filter.md](components/filter.md) |
+| [x] | 21 | **Webflow** Map Band: new maps drawn from OpenStreetMap (desktop 1200×360 `schwabe-map-platt-park-wide-osm.webp`, mobile `…-mobile-osm.webp`, attribution included), desktop height 700→360, label no longer on top of Evans, card below the map ≤991, `[data-map-cover]` link over the whole map, "↗" removed from the link text | Contact | — |
+| [ ] | 21 | Code: link icon (CSS mask, not the emoji) + one-line link → `src/styles/map.css` | Contact | — |
+| [ ] | 25 | Blog final images: **blocked**. The latest Figma (`1154:14158`) uses the same 3 photos as staging, there are no final ones yet | Blog | — |
+| [ ] | 8 / 17 / 24 | Blocked: #8 needs the photo originals, #17 waits for the Figma update, #24 is in Site settings → Forms (Pablo/Derek) | — | — |
+| [ ] | — | `_to_delete/osm-platt-park.json` (OSM data used for the map) can be deleted | — | — |
+
+## 2026-10-13 · Pastel (Derek 9-10/10), batch of quick fixes
+| ✓ | What didn't match | Prod | Doc |
+| --- | --- | --- | --- |
+| [x] | #12 "Read Dr. Schwabe's Full Story" button went to `/our-story` | [/team](https://schwabe.webflow.io/team) → `/our-story#dr-schwabe` | — |
+| [x] | #19 Contact "Call" button didn't respond: `.statement_bg-image-wrapper` (hero texture, z-index 2) covered it. Now `pointer-events: none` | [/contact](https://schwabe.webflow.io/contact) | — |
+| [ ] | #19 Phone numbers inside Plain Text/CMS (Medicare, FAQ, New Patients, Wellness, Find Us) without a link → new `src/utils/tel-links.js` in global.js + `.u-tel` class in Webflow. **Pending deploy** | several | `src/utils/tel-links.js` |
+| [x] | #16 Patient Stories hero quote box (hidden in Stories Hero) | [/patient-stories](https://schwabe.webflow.io/patient-stories) | — |
+| [x] | #23 Featured story without photo per Figma `1249:23751`: eyebrow + H2 + green quote on the left (`featured-story_quote` static), story on the right | [/patient-stories#featured-story](https://schwabe.webflow.io/patient-stories#featured-story) | — |
+| [x] | #27 FAQ "Still have questions?" without photo per Figma `1249:19668`: instance **unlinked** from `Section / Feature Card` (it was the only one), `feature_card.cc-text` (title left, copy+button right, padding 48/80), section combo renamed `cc-beige`. ⚠️ Figma copy differs: "Call or text us at 720-432-9157, or book your 60-minute first visit and ask your doctor in person." (not changed) | [/faq](https://schwabe.webflow.io/faq#still-have-questions) | — |
+| [x] | #20 Contact exterior photo: Image Style `aspect-ratio: 712/350` (crops out the yellow curb). Temporary until the 16/10 shoot | [/contact](https://schwabe.webflow.io/contact) | — |
+| [x] | #11 New Patients hero: new asset `0246_new-patients-hero-crop.webp` (right crop of the original, both people in frame like Figma `1249:18150`) | [/new-patients](https://schwabe.webflow.io/new-patients) | — |
+| [x] | #9 CTA photo: the image was 840 wide and spilled 160px under the green panel (Image component custom aspect variant). `img-component.cc-media-fill` now `width: 100%`; `--img-pos: 0% 50%` on the 7 pages with photo 0245 | home, fees, wellness, new-patients, patient-stories, community, products | — |
+| [x] | #10 Sports Injuries dome: `intro_dome.cc-four` 15×9rem + icon `intro-dome_icon.cc-lg` (10rem), like the Hub | [/care/sports-…](https://schwabe.webflow.io/care/sports-activity-overuse-injuries) | — |
+| [x] | #15 Fees: olive check marker without a box (`quick_mark`, CSS borders), Payment methods `ph-check` olive, includes intro → H3 size H6, list gap 0.5rem, "Good to know" left-aligned | [/fees-and-policies](https://schwabe.webflow.io/fees-and-policies#wellness-membership) | — |
+| [ ] | #15 "Good to know:" in bold → new `src/utils/lead-labels.js` wraps the label in `<strong>` (list `LABELS`). **Pending deploy** | ″ | `src/utils/lead-labels.js` |
+| [x] | #28 Our Story Four Things: card paragraphs `u-text-left`, titles centered. The site-wide rule (+3 lines left-aligned) is still to review page by page | [/our-story](https://schwabe.webflow.io/our-story) | — |
+| [ ] | #8 Photo colors: the served webp files have no ICC. Need the Drive originals to confirm P3/Adobe RGB and re-export them as sRGB | [/team](https://schwabe.webflow.io/team) | — |
+| [ ] | Team CTA on mobile: image with `object-fit: contain` at 210px inside a 350px wrapper (existing, not touched) | [/team](https://schwabe.webflow.io/team) | — |
+| [ ] | Reply to / resolve the comments in Pastel (waiting for Pablo's OK) | — | — |

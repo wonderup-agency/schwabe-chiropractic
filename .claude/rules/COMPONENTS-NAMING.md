@@ -1028,10 +1028,12 @@ de instancia única, no molesta.
 | 24 | Fees | `cc-quick` #1 | `Section / Fees At A Glance` | 22 | ✅ verificado |
 | 25 | Fees | `cc-insurance` | `Section / Insurance` | 9 | ✅ verificado |
 | 26 | Fees | `cc-quick` #2 | `Section / Cancellation Policy` | 10 | ✅ verificado |
-| 27 | Fees | `cc-quick` #3 | `Section / Payment Methods` | 6 | ✅ verificado |
+| 27 | Fees | `cc-quick` #3 | `Section / Payment Methods` (checklist de 4, copy v0_2) | 7 | ✅ verificado |
 | 28 | Fees | `cc-approach` #1 | `Section / Appointment Fees` | 21 | ✅ verificado |
-| 29 | Fees | `cc-approach` #2 | `Section / HSA FSA` | 11 | ✅ verificado |
+| 29 | Fees | `cc-approach` #2 | `Section / Shockwave Fees` (ex HSA FSA; el texto HSA pasó a Payment Methods, copy v0_2) | 5 | ✅ verificado |
 | 30 | Fees | `cc-approach` #3 | `Section / Membership Summary` | 30 | ✅ verificado |
+| 30a | Fees | `cc-quick` + `policy_grid.cc-three` | `Section / Payment Options` (21a5b50c, copy v0_2) | 9 | ✅ verificado 2026-10-08 |
+| 30b | Fees | `cc-medicare` | `Section / Medicare` (86cf3c11, duplicado de Practice Philosophy, copy v0_2) | 13 | ✅ verificado 2026-10-08 |
 | 31 | Blog | `cc-blog-intro` | `Section / Blog Intro` | 7 | ✅ verificado |
 | 32 | Patient Stories | `cc-stories-hero` | `Section / Stories Hero` | 13 | ✅ verificado |
 | 33 | Patient Stories | `cc-stories-intro` | `Section / Stories Intro` | 5 | ✅ verificado |

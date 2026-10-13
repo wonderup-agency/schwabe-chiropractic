@@ -1,5 +1,7 @@
 # filter
 
+> **2026-10-13 · Pastel #18** (sólo `.themes_filter`, Patient Stories): todas las chips con borde, la activa rellena Forest; en mobile una sola fila con scroll horizontal que llega al borde, y menos aire arriba.
+
 ## Purpose
 
 Filtra **un solo Collection List** en el cliente. Lo usan dos secciones:

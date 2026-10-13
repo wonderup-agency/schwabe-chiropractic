@@ -32,13 +32,5 @@ html.anim-failsafe [data-statement-lines] > * {
   }
 }
 
-/* The section only pins above 768 AND with real height to spare. The second
-   term is not paranoia: a phone on its side (844×390) lands in Webflow's
-   Tablet breakpoint and would pass a bare min-width. See RESPONSIVE.md */
-@media (min-width: 768px) and (min-height: 600px) and (prefers-reduced-motion: no-preference) {
-  .section.cc-statement {
-    min-height: 100dvh;
-    display: flex;
-    align-items: center;
-  }
-}
+/* Pastel #5 (2026-10-13): the section no longer pins, so it no longer needs
+   to measure a full viewport. It keeps the spacing Webflow gives it. */

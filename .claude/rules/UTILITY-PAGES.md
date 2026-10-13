@@ -692,3 +692,7 @@ quiere igualar, es una escritura.
 
 **Falta correr `/responsive`** sobre las dos páginas después de este cambio: la
 grilla invirtió proporciones y el colapso de `medium` no se midió.
+
+## Thank You (`/thank-you`)
+
+Created 2026-10-08 as a **duplicate of the 404** (same section `cc-error`, photo, scrim and Nav/Footer). Changes against the 404: the `404` numeral Plain Text has `Visibility` off, H1 "Thank you. Your guide is ready.", and `.hero_actions.cc-center` has two buttons: Primary "Download the guide" (`#guide-download`, new tab, link to the PDF pending) and Secondary "Back to home". The `Section / Free Guide` form redirects here (`redirect: /thank-you`). There's no Figma frame; the copy is a placeholder to validate with Derek.
