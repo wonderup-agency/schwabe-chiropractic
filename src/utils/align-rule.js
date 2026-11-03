@@ -13,13 +13,16 @@ la section/container) y, si algún párrafo del bloque corre 4+ líneas al ancho
 actual, le pone `u-align-left` al bloque. Se recalcula al cargar las fuentes y
 en cada resize (debounced), así que vale por ancho y sigue al copy.
 
-Cubre también #57, #61, #69 y #72.
+Cubre también #57, #61, #69 y #72. Los headings cuentan igual que los
+párrafos: un H2 de 4+ líneas centrado también pasa el bloque a la izquierda
+(#61, el H2 de Membership Options a 390).
 */
 
 const LABEL = 'align-rule'
 const CLASS = 'u-align-left'
 const MAX_LINES = 3
-const TEXT = 'p, .plain-text'
+// Headings too: #61 is a 4-line centered H2 on phone.
+const TEXT = 'p, .plain-text, h1, h2, h3, h4, .heading-text'
 const STOP = 'section, .section, .container, main, body'
 const SKIP =
   '.button, button, nav, footer, form, .marquee-component, .swiper, .cost-band_lines, .statement_layout, [data-align-keep]'
@@ -51,7 +54,10 @@ function apply() {
     .forEach((el) => el.classList.remove(CLASS))
 
   const blocks = new Set()
-  document.querySelectorAll(`main ${TEXT}`).forEach((el) => {
+  const sel = TEXT.split(',')
+    .map((t) => `main ${t.trim()}`)
+    .join(', ')
+  document.querySelectorAll(sel).forEach((el) => {
     if (!el.offsetParent || el.closest(SKIP)) return
     if (getComputedStyle(el).textAlign !== 'center') return
     if (lineCount(el) > MAX_LINES) blocks.add(blockOf(el))
