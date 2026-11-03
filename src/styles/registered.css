@@ -24,8 +24,9 @@ Las tres primeras declaraciones NO son redundantes: el user-agent le da al
 pisarlas o el 60% y la altura no son los nuestros.
 */
 
+/* Pastel 978216 #40: 60% everywhere, never below 10px. */
 .u-reg {
-  font-size: 0.6em;
+  font-size: max(0.6em, 10px);
   vertical-align: baseline;
   line-height: 0;
   position: relative;

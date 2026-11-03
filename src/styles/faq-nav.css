@@ -1,0 +1,20 @@
+/* Pastel 978216 #64: the FAQ section menu marks the section in view the same
+   way the main nav marks the current page. Webflow adds w--current to in-page
+   anchor links; the Designer can't style that state on this link via MCP. */
+.faq-nav_link.w--current {
+  color: var(--_color---brand--olive-green, #6b744e);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.45em;
+}
+
+/* Pastel 978216 #66: the phone menu scrolls sideways; hide the scrollbar like
+   the Patient Stories theme filters. */
+@media (max-width: 767px) {
+  .faq_nav {
+    scrollbar-width: none;
+  }
+  .faq_nav::-webkit-scrollbar {
+    display: none;
+  }
+}

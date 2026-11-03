@@ -51,7 +51,11 @@ import '../styles/registered.css'
 import '../styles/select.css'
 import '../styles/focus.css'
 import '../styles/equal-rows.css'
+import '../styles/card-grid.css'
 import '../styles/map.css'
+import '../styles/align-rule.css'
+import '../styles/section-tight.css'
+import '../styles/faq-nav.css'
 import { armFoucFailsafe } from '../utils/motion.js'
 import formatRegistered from '../utils/registered.js'
 import fixImageSizes from '../utils/image-sizes.js'
@@ -59,6 +63,9 @@ import anchorScroll from '../utils/anchor-scroll.js'
 import telLinks from '../utils/tel-links.js'
 import equalRows from '../utils/equal-rows.js'
 import leadLabels from '../utils/lead-labels.js'
+import alignRule from '../utils/align-rule.js'
+import footerYear from '../utils/footer-year.js'
+import sectionTight from '../utils/section-tight.js'
 
 export default function () {
   armFoucFailsafe()
@@ -68,4 +75,7 @@ export default function () {
   telLinks()
   leadLabels()
   equalRows()
+  alignRule()
+  footerYear()
+  sectionTight()
 }

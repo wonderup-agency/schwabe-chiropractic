@@ -1,5 +1,10 @@
 /*
-Symptom card — the olive rule and the inverted hover
+Symptom card — the olive rule and the hover
+
+2026-11 (Pastel #35): the hover no longer inverts the card. It only turns
+the border Olive Green. The notes below about the inversion (child colour,
+"the crossing", 160ms) are kept as history: they explain why the old hover
+blinked and still apply if anyone brings the inversion back.
 
 The six cards in "You've tried to get this sorted. It keeps coming back."
 (`cc-sound-familiar`). Figma frame 974:1594, card component 974:1704.
@@ -34,8 +39,7 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
   /* Arrival values only. The resting ones are whatever `.symptoms_card`
      has in the Designer — restating them here would be a second copy free
      to drift. */
-  --symptom-bg-hover: var(--_color---brand--forest-green);
-  --symptom-fg-hover: var(--_color---brand--beige);
+  --symptom-border-hover: var(--_color---brand--olive-green, #6b744e);
 
   /* The rule. Olive Green is the brand token; see the note at the bottom
      about the colour the Figma actually used. */
@@ -43,9 +47,7 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
   --symptom-rule-w: 24px;
   --symptom-rule-h: 2px;
 
-  transition:
-    background-color var(--symptom-dur) var(--symptom-ease),
-    color var(--symptom-dur) var(--symptom-ease);
+  transition: border-color var(--symptom-dur) var(--symptom-ease);
 }
 
 /* ── The rule ───────────────────────────────────────────────────────────
@@ -73,14 +75,18 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
    focus rule would never fire and would only suggest interactivity that
    isn't there.
 
-   The border does NOT change, and neither does the rule. Both keep their
-   resting colour against the dark fill — that is what the Figma shows
-   (974:1747), and it is what keeps the card's silhouette readable as it
-   inverts. */
+   (Before #35 the border did NOT change and the card inverted instead,
+   per Figma 974:1747. Derek replaced that with the border cue.) */
+/* PASTEL #35 (Derek, 2026-11): the inversion is gone. "Keep the dark fill
+   for 'You're quietly starting to wonder' only. For hover, use a subtle cue
+   such as the border changing to olive, with no fill change." The dark card
+   is `.symptoms_card.cc-dark` in the Designer, a resting state, not a hover.
+   So the hover now only moves the border to Olive Green, on every card
+   (the dark one included). Fill and text colour never change, which also
+   means there is no colour crossing any more (see "the crossing" below). */
 @media (hover: hover) and (pointer: fine) {
   [data-symptom-card]:hover {
-    background-color: var(--symptom-bg-hover);
-    color: var(--symptom-fg-hover);
+    border-color: var(--symptom-border-hover);
   }
 }
 

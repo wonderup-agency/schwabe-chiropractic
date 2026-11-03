@@ -19,12 +19,30 @@ export default function fixImageSizes() {
   const images = document.querySelectorAll('img[srcset]')
   if (!images.length) return
 
+  // Pastel 978216 #60/#63: object-fit cover draws a photo wider than its box
+  // when the photo is proportionally wider (3:2 photo in a portrait frame), so
+  // ask for the drawn width. offsetWidth/Height ignore reveal transforms.
   const apply = (img) => {
-    const width = Math.ceil(img.getBoundingClientRect().width)
-    if (width > 0) img.sizes = `${width}px`
+    const w = img.offsetWidth
+    const h = img.offsetHeight
+    if (!w) return
+    let drawn = w
+    if (
+      getComputedStyle(img).objectFit === 'cover' &&
+      img.naturalWidth &&
+      img.naturalHeight
+    ) {
+      drawn = Math.max(w, h * (img.naturalWidth / img.naturalHeight))
+    }
+    img.sizes = `${Math.ceil(drawn)}px`
   }
 
   images.forEach(apply)
+  // naturalWidth is 0 until the first candidate decodes; re-apply once loaded.
+  images.forEach((img) => {
+    if (!img.complete)
+      img.addEventListener('load', () => apply(img), { once: true })
+  })
 
   if (!('ResizeObserver' in window)) return
   const observer = new ResizeObserver((entries) => {

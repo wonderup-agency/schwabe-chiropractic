@@ -1,0 +1,34 @@
+/* Pastel #52 / #54 (Derek, 2026-11): "Odd number: center last card on desktop
+   and tablet." Applies to the Team Member grid (/team) and the Partner grid
+   (/community-partners), the two grids the client now grows by duplicating
+   card instances in the Designer, so the count can be odd at any time.
+
+   Webflow's Designer can't express "last child that is also odd", so it lives
+   here. The lone last card spans the row and centres itself at the width of
+   one column: (row - column-gap) / 2. The 2rem is the column-gap both grids
+   declare in the Designer (`.team_grid` and `.partners_grid`, base); if that
+   gap changes, change it here too.
+
+   Gated where each grid actually has two columns: `.team_grid` keeps 2 down
+   to Tablet and goes to 1 at <=767; `.partners_grid` already goes to 1 at
+   <=991 (Designer, medium). Below those widths every card is alone in its
+   row and nothing needs centring.
+
+   Equal heights, the pinned link/button and "texts follow each other" are
+   Designer CSS (grid stretch, flex column, margin-top: auto). equal-rows.js
+   skips both grids on purpose, see the header there. */
+@media (min-width: 768px) {
+  .team_grid > :last-child:nth-child(odd):not(:first-child) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc((100% - 2rem) / 2);
+  }
+}
+
+@media (min-width: 992px) {
+  .partners_grid > :last-child:nth-child(odd):not(:first-child) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc((100% - 2rem) / 2);
+  }
+}

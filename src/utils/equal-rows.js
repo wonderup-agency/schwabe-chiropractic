@@ -22,6 +22,18 @@ Fees…), así que esto es genérico en vez de una regla por clase:
 
 Se recalcula al cargar las fuentes y en cada resize (debounced). Quedan afuera
 sliders, marquesinas, forms, nav y footer.
+
+Pastel #52 / #54 (Derek, 2026-11): las cards de Partner y de Team Member quedan
+AFUERA (`.partners_grid`, `.team_grid` en SKIP). Su regla es otra: logo/foto y
+nombre arrancan a la misma altura, el resto del texto va pegado uno detrás de
+otro (las descripciones NO se alinean entre cards) y el link/botón va al fondo.
+Eso lo hace el CSS del Designer (card flex column + grid stretch + link con
+margin-top: auto); equalizar el min-height por posición abría huecos en las
+cards vecinas de una con practice line (Healing Roots, Rise).
+
+Pastel #50: los items de *Four things* (variant Columns Check, Our Story) no
+tienen fondo ni borde y su fila mezcla filetes con items, así que la búsqueda
+genérica no los encuentra. Entran por OPT_IN: grupo explícito por selector.
 */
 
 const LABEL = 'equal-rows'
@@ -30,7 +42,16 @@ const SLOT = 'h1, h2, h3, h4, h5, h6, p, .heading-text, .plain-text, .eyebrow'
 const NOT_CARD =
   '.button, [data-btn], button, input, select, [class*="chip"], [class*="pill"], [class*="tag"], .w-dropdown'
 const SKIP =
-  '.swiper, .w-slider, .marquee-component, [data-component="symptoms"], form, nav, footer, .w-nav, [data-eq-off]'
+  '.swiper, .w-slider, .marquee-component, [data-component="symptoms"], form, nav, footer, .w-nav, [data-eq-off], .partners_grid, .team_grid'
+// Card rows the generic search can't see (no card look, mixed siblings).
+// [container selector, card selector]. The Stacked variants of Four Things
+// run one item per row, so they are left out on purpose.
+const OPT_IN = [
+  [
+    '.section.cc-four:not([data-wf--section-four-things--variant*="stacked"]) .four_row',
+    '.four_item',
+  ],
+]
 
 function looksLikeCard(el) {
   if (el.matches(NOT_CARD)) return false
@@ -56,6 +77,12 @@ function findGroups(scope) {
     if (!/grid|flex/.test(display)) return
     if (!kids.every(looksLikeCard)) return
     groups.push(kids)
+  })
+  OPT_IN.forEach(([row, card]) => {
+    scope.querySelectorAll(row).forEach((parent) => {
+      const kids = Array.from(parent.children).filter((k) => k.matches(card))
+      if (kids.length > 1) groups.push(kids)
+    })
   })
   // A card grid nested inside another card grid is still its own group; the
   // outer pass runs first, so its slots never include the inner cards' text.

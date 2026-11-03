@@ -15,6 +15,16 @@ CDN del bundle: **`@970fb4b`** · último commit pusheado: **`d8553d2`**
 > es aplicar. Detalle en [FIGMA-AUDIT.md](FIGMA-AUDIT.md).
 
 
+## Pastel 978216 (Derek, ronda 2026-11-03) · Fase 1 por código
+
+| ✓ | # | Qué | Nota |
+| --- | --- | --- | --- |
+| [x] | 40 | Todos los ® visibles con `.u-reg` | `registered.js` ya no aplica "primera mención"; `max(0.6em, 10px)`. Reemplaza Final review #101 |
+| [x] | 34 | Regla de alineación por conteo de líneas | `align-rule.js` + `align-rule.css`: bloque centrado con un párrafo de 4+ líneas → `u-align-left`. Cubre #57 #61 #69 #72 |
+| [x] | 48 | Año del footer automático | `footer-year.js` reescribe el año después del © |
+| [x] | 68 | Padding tight entre secciones vecinas del mismo fondo | `section-tight.js` + `section-tight.css` (`is-continued`), usa la variable `Section / Padding Tight` |
+| [ ] | 54 | Partner cards fuera de `equal-rows.js` | Fase 2 |
+
 ## ✅ Feedback de Derek · aplicado por MCP — 2026-10-05
 
 Publicado en `webflow.io` y verificado con Playwright (1440 y 390).

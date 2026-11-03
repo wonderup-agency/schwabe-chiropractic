@@ -1,0 +1,5 @@
+/* Pastel 978216 #68: same-background neighbour → tight top padding
+   (src/utils/section-tight.js). */
+.section.is-continued {
+  padding-top: var(--_components---section--padding-tight, 3rem) !important;
+}

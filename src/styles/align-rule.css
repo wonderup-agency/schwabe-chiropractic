@@ -1,0 +1,25 @@
+/* Pastel 978216 #34: a centered block with any paragraph of 4+ lines at the
+   current width goes left as a whole (src/utils/align-rule.js). */
+.u-align-left,
+.u-align-left * {
+  text-align: left !important;
+}
+.u-align-left {
+  align-items: flex-start !important;
+}
+.u-align-left > * {
+  margin-left: 0 !important;
+}
+/* The eyebrow with rules either side is a centred flex row: start it left too. */
+.u-align-left [class*='eyebrow'] {
+  justify-content: flex-start !important;
+  margin-left: 0 !important;
+}
+.u-align-left [class*='_title-block'] {
+  align-items: flex-start !important;
+}
+/* The "rules either side" eyebrow: with the block left-aligned, the left rule
+   would push the label off the text edge, so only the trailing rule stays. */
+.u-align-left .eyebrow-row > .u-border:first-child {
+  display: none;
+}

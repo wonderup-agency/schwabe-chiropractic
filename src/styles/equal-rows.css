@@ -2,3 +2,19 @@
 [data-eq-card] {
   align-self: stretch;
 }
+
+/* Pastel #37 (Derek, 2026-11): in the "This is what thorough looks like"
+   arch cards the label sits next to the big number inside
+   `.differentiator-card_figure`, which already centres its children
+   (align-items: center, Designer). equal-rows.js then gives the label's
+   `.plain-text` the min-height of the tallest label in the row (50px when a
+   neighbour wraps to 3 lines), and a one- or two-line label sat at the top
+   of that taller box: measured 19px off centre on "of visits", 11px on
+   "Same doctor" at 1440. Centring the slot's own content keeps the row
+   alignment and puts the text back on the number's axis, whatever the
+   line count. Scoped to the figure so no other card changes. */
+.differentiator-card_figure [data-eq-slot] {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}

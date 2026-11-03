@@ -140,29 +140,45 @@ del CMS).
     opacity: 1;
     color: var(--_color---brand--olive-green, #6b744e);
   }
-
-  /* La rayita de la página actual. Vive en el padding izquierdo del link
-     para no correr el texto. */
-  .nav-link.cc-dropdown-link.w--current::before,
-  .nav-link.cc-dropdown-link[data-nav-current]::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0.375rem;
-    width: 0.375rem;
-    height: 2px;
-    border-radius: 1px;
-    background-color: currentColor;
-    transform: translateY(-50%);
-  }
 }
 
-/* Mobile: el menú hamburguesa también marca la sección actual, sin
-   subrayados (ahí el link ocupa todo el ancho). */
+/* La rayita de la página actual. Vive en el padding izquierdo del link
+   para no correr el texto. Sin media query: en desktop y en el menú
+   hamburguesa (Pastel #32, Derek 2026-11: en el teléfono el color solo no
+   alcanzaba para distinguir la página actual). En los dos breakpoints el
+   link tiene 1rem de padding izquierdo (desktop: este archivo; ≤991: el
+   Designer, 8px 16px), así que la rayita (0.375rem → 0.75rem) nunca toca
+   el texto. */
+.nav-link.cc-dropdown-link.w--current::before,
+.nav-link.cc-dropdown-link[data-nav-current]::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0.375rem;
+  width: 0.375rem;
+  height: 2px;
+  border-radius: 1px;
+  background-color: currentColor;
+  transform: translateY(-50%);
+}
+
+/* Mobile: el menú hamburguesa marca la sección actual igual que desktop:
+   Olive + subrayado de 2px en el label de nivel superior (About, Care,
+   New Patients, y también Fees / Patient Stories / Contact), rayita en el
+   link del dropdown. El subrayado va en el texto, no en la fila: el
+   toggle es flex y la decoración se propaga a su texto, no a todo el
+   ancho. */
 @media (max-width: 991px) {
   .nav-menu .nav-link[data-nav-current],
   .nav-link.cc-dropdown-link.w--current {
     opacity: 1;
     color: var(--_color---brand--olive-green, #6b744e);
+  }
+
+  .nav-menu .nav-link[data-nav-current]:not(.cc-dropdown-link) {
+    text-decoration: underline;
+    text-decoration-color: currentColor;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.45em;
   }
 }
