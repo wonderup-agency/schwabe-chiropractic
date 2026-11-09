@@ -1,0 +1,56 @@
+/* Pastel 978216 #43: final CTA photo 0245.
+   The photo has to end just right of the Schwabe Chiropractic sign (the
+   Colorado Shockwave sign is already cut at the source edge) and keep both
+   people in frame at every width. Instances that carry the crop set
+   --img-crop (1888/1706 of the 2560×1706 file) and --img-pos in the Image
+   Style prop; everything here is scoped to those.
+
+   ≥1200  side by side. The photo box keeps the crop ratio and fills from the
+          left, so the right edge lands on the sign. If the text runs taller
+          the box only gets taller (a narrower slice, sign still whole).
+   ≤1199  stacked like tablet (992–1199 used to squeeze the photo into a
+          portrait column that always cut a person or the sign). Fixed 16:10
+          box; the photo is sized to the crop width (2560/1888 = 135.6%) and
+          shifted up 10% to keep the sign and both faces. */
+
+@media (min-width: 1200px) {
+  .cc-cta-card:has(.img-component[style*='--img-crop']) {
+    min-height: 0;
+  }
+  .cc-cta-card:has(.img-component[style*='--img-crop']) .cta_media {
+    aspect-ratio: 1.107;
+    height: auto;
+    align-self: stretch;
+  }
+}
+
+@media (max-width: 1199px) {
+  .cc-cta-card:has(.img-component[style*='--img-crop']) {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .cc-cta-card:has(.img-component[style*='--img-crop']) > * {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  .cc-cta-card:has(.img-component[style*='--img-crop']) .cta_media {
+    aspect-ratio: 16 / 10;
+    height: auto;
+    order: -1;
+  }
+  .cc-cta-card .cta_media .img-component[style*='--img-crop'] {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto;
+    height: 100%;
+  }
+  .cc-cta-card .cta_media .img-component[style*='--img-crop'] img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 135.6%;
+    max-width: none;
+    height: auto;
+    transform: translateY(-10%);
+  }
+}
