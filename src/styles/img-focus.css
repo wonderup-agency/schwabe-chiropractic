@@ -1,0 +1,44 @@
+/* Pastel 978216 #44: vertical focal point for hero photos.
+
+   Derek asked for crops done in Webflow with a focal point, not by
+   re-exporting files. Webflow reserves the `style` attribute, so a native
+   Image can't take an inline object-position from a prop. Instead the
+   component binds a prop to `data-img-y` and this file maps the value.
+
+   Page Header ("Image Focus Y") and Injury Hero ("Photo Focus Y") use it.
+   Values 0 to 100 in steps of 10; empty keeps the default 50% 50%.
+   The portrait photos only crop hard on phones and tablet (wide box), so
+   this mostly matters there, but it applies at every width. */
+img[data-img-y='0'] {
+  object-position: 50% 0%;
+}
+img[data-img-y='10'] {
+  object-position: 50% 10%;
+}
+img[data-img-y='20'] {
+  object-position: 50% 20%;
+}
+img[data-img-y='30'] {
+  object-position: 50% 30%;
+}
+img[data-img-y='40'] {
+  object-position: 50% 40%;
+}
+img[data-img-y='50'] {
+  object-position: 50% 50%;
+}
+img[data-img-y='60'] {
+  object-position: 50% 60%;
+}
+img[data-img-y='70'] {
+  object-position: 50% 70%;
+}
+img[data-img-y='80'] {
+  object-position: 50% 80%;
+}
+img[data-img-y='90'] {
+  object-position: 50% 90%;
+}
+img[data-img-y='100'] {
+  object-position: 50% 100%;
+}
