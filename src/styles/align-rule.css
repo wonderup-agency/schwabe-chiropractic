@@ -15,7 +15,11 @@
   justify-content: flex-start !important;
   margin-left: 0 !important;
 }
-.u-align-left [class*='_title-block'] {
+/* Any title wrapper inside the block (`_title-block`, `cost-head_title`…)
+   may be a centred flex column; start it left too. Derek, #34 reply of
+   2026-11-10: Cost of Waiting eyebrow and heading stayed centred because
+   `cost-head_title` didn't match the old `_title-block` selector. */
+.u-align-left [class*='_title'] {
   align-items: flex-start !important;
 }
 /* The "rules either side" eyebrow: with the block left-aligned, the left rule
