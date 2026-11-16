@@ -46,6 +46,14 @@ select.w-select::-ms-expand {
   transform: translateY(-30%) rotate(-135deg);
 }
 
+/* Pastel 978216 #83/#84: when the wrapper also holds a visible label, 50% of
+   the wrapper is no longer the middle of the select, so the chevron sat up
+   by the label. Anchor it to the bottom instead: the select is 3rem tall, so
+   its middle is 1.5rem up and the 0.5rem chevron box starts 1rem up. */
+:where(:has(> label ~ select.w-select))::after {
+  top: auto;
+  bottom: 1rem;
+}
 @media (prefers-reduced-motion: reduce) {
   :where(:has(> select.w-select))::after {
     transition: none;
