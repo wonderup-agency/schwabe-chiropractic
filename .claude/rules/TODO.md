@@ -23,6 +23,7 @@ CDN del bundle: **`@970fb4b`** · último commit pusheado: **`d8553d2`**
 | [x] | 35 | Hover de problem cards bloqueado en clones | `symptoms.js`: clones sin `inert`, `aria-hidden` + `tabindex=-1` |
 | [x] | 89 | FAQ pills rotas al editar en CMS | `pill-links.js` marca `a` solo en un `p`/`div` como `.is-pill-link` |
 | [x] | 81 | Care heroes en phone/tablet | Webflow: `cc-injury-context` medium `margin-top -4rem` + `padding-top 6.5rem`; `injury-hero_media` medium 5/4, small 4/5. `img-focus.js` acepta cualquier 0–100, `%`, top/center/bottom. Tooltips de Focus Y actualizados |
+| [x] | 84 | Dropdown custom | `custom-select.js` + `select.css`: botón con las clases del select + listbox; el select nativo queda oculto para el submit. Opt-out `data-native-select` |
 | [x] | 82  83 84 86 87 88 90 | Fees, labels Join, select, eyebrows Contact, read time | Aplicado por MCP |
 | [ ] | 83 | Placeholders del form de Join | Pablo a mano en el Designer (MCP no los setea) |
 | [ ] | 90 | Borrar campo CMS `read-time` de Blogs | Necesita OK de Pablo (el clasificador lo bloqueó) |
