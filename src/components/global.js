@@ -68,6 +68,9 @@ import leadLabels from '../utils/lead-labels.js'
 import alignRule from '../utils/align-rule.js'
 import footerYear from '../utils/footer-year.js'
 import sectionTight from '../utils/section-tight.js'
+import pillLinks from '../utils/pill-links.js'
+import imgFocus from '../utils/img-focus.js'
+import jobStartOpen from '../utils/job-start-open.js'
 
 export default function () {
   armFoucFailsafe()
@@ -80,4 +83,7 @@ export default function () {
   alignRule()
   footerYear()
   sectionTight()
+  pillLinks()
+  imgFocus()
+  jobStartOpen()
 }

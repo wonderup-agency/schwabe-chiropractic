@@ -81,7 +81,8 @@ details.accordion-component[open] > .accordion-trigger > .accordion-icon path {
    2. Images (the Evidence-Based Practice diagram) at Figma's size: 400px
       max, square, 24px under the copy. Without `height: auto` the img keeps
       its height attribute and stretches. */
-.accordion-content .w-richtext > div > a:only-child {
+.accordion-content .w-richtext > div > a:only-child,
+.accordion-content .w-richtext a.is-pill-link {
   display: inline-flex;
   align-items: center;
   margin-top: 0.5rem;
@@ -99,7 +100,8 @@ details.accordion-component[open] > .accordion-trigger > .accordion-icon path {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .accordion-content .w-richtext > div > a:only-child:hover {
+  .accordion-content .w-richtext > div > a:only-child:hover,
+  .accordion-content .w-richtext a.is-pill-link:hover {
     background-color: color-mix(
       in srgb,
       var(--_color---brand--olive-green) 12%,
@@ -108,7 +110,8 @@ details.accordion-component[open] > .accordion-trigger > .accordion-icon path {
   }
 }
 
-.accordion-content .w-richtext > div > a:only-child:focus-visible {
+.accordion-content .w-richtext > div > a:only-child:focus-visible,
+.accordion-content .w-richtext a.is-pill-link:focus-visible {
   outline: 2px solid var(--_color---brand--olive-green);
   outline-offset: 2px;
 }

@@ -78,3 +78,23 @@ details.job-card[open] > .job-card_summary > .job-card_icon::after {
   outline: 2px solid var(--_color---brand--olive-green);
   outline-offset: -2px;
 }
+
+/* Pastel 978216 #85: CMS version of the card. The two columns and the apply
+   strip come from Rich Text fields, so the bullets are a plain `<ul>` inside
+   `.job-card_rich` instead of the Designer's `.job-card_list`. Same spacing. */
+.job-card_rich > :first-child {
+  margin-top: 0;
+}
+.job-card_rich > :last-child {
+  margin-bottom: 0;
+}
+.job-card_rich ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding-left: 1.125rem;
+}
+.job-card_rich p {
+  margin: 0;
+}

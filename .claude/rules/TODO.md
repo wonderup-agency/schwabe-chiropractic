@@ -15,6 +15,20 @@ CDN del bundle: **`@970fb4b`** · último commit pusheado: **`d8553d2`**
 > es aplicar. Detalle en [FIGMA-AUDIT.md](FIGMA-AUDIT.md).
 
 
+## Pastel 978216 · ronda Derek 2026-11-12 a 11-16
+
+| ✓ | # | Qué | Nota |
+| --- | --- | --- | --- |
+| [x] | 80 | Area card oscura con texto oscuro en touch | `area-card.css`: `:focus-within` → `:has(:focus-visible)` + texto claro en hover/focus |
+| [x] | 35 | Hover de problem cards bloqueado en clones | `symptoms.js`: clones sin `inert`, `aria-hidden` + `tabindex=-1` |
+| [x] | 89 | FAQ pills rotas al editar en CMS | `pill-links.js` marca `a` solo en un `p`/`div` como `.is-pill-link` |
+| [x] | 81 | Care heroes en phone/tablet | Webflow: `cc-injury-context` medium `margin-top -4rem` + `padding-top 6.5rem`; `injury-hero_media` medium 5/4, small 4/5. `img-focus.js` acepta cualquier 0–100, `%`, top/center/bottom. Tooltips de Focus Y actualizados |
+| [x] | 82  83 84 86 87 88 90 | Fees, labels Join, select, eyebrows Contact, read time | Aplicado por MCP |
+| [ ] | 83 | Placeholders del form de Join | Pablo a mano en el Designer (MCP no los setea) |
+| [ ] | 90 | Borrar campo CMS `read-time` de Blogs | Necesita OK de Pablo (el clasificador lo bloqueó) |
+| [ ] | 85 | Job cards editables | Colección **Open Roles** creada (`6afb3e90f504c750962ae7e1`) con los 2 roles. La Collection List NO se puede armar por MCP: dentro del componente no hay contexto CMS y sort/filter fallan con "[Conflict] component map". Falta en el Designer: Collection List en Current Openings, filtro Active=on, sort Sort Order asc, bindings, marker `[data-job-start-open]` con visibilidad = Start Open, rich text con clase `job-card_rich`, empty state. CSS y JS ya están (`job-card.css`, `job-start-open.js`) |
+| [ ] | 41 | Botones que hacen wrap en 375 | Abierto a pedido de Pablo |
+
 ## Pastel 978216 (Derek, ronda 2026-11-03) · Fase 1 por código
 
 | ✓ | # | Qué | Nota |
@@ -815,3 +829,65 @@ Everything below is code in the repo (**pending build + deploy**) unless it says
 | [ ] | #8 Photo colors: the served webp files have no ICC. Need the Drive originals to confirm P3/Adobe RGB and re-export them as sRGB | [/team](https://schwabe.webflow.io/team) | — |
 | [ ] | Team CTA on mobile: image with `object-fit: contain` at 210px inside a 350px wrapper (existing, not touched) | [/team](https://schwabe.webflow.io/team) | — |
 | [ ] | Reply to / resolve the comments in Pastel (waiting for Pablo's OK) | — | — |
+
+## 2026-11-09 · Pastel #44 · fotos de prod contra el Figma "Final review"
+
+Barrido por hash perceptual: imágenes fuente de cada frame del Figma contra los assets de Webflow y lo que sirve prod. Las que coinciden no se listan.
+
+| ✓ | Qué no matchea | Prod | Doc |
+| --- | --- | --- | --- |
+| [x] | Our Story bio: 0102 viejo → batch `6acf8d0b1474e8e34da551b1` (mismo encuadre 2:3) | /our-story#dr-schwabe | — |
+| [x] | Home `#plan`: prod 0243, Figma **0242** (`6acf8d0ee439a59863b9b978`). Casi idénticas | / | — |
+| [x] | Home testimonials: prod `testimonials-mountain-trail`, Figma **colorado_summer_mountains** (`6acf8d12dc5d67cf6b75fbc9`) | / | — |
+| [x] | Home card de Shockwave: prod 0340, Figma **0272** (`6acf8d0ff74043494266d5c6`) | / | — |
+| [x] | Wellness hero: prod 0063, Figma **0043** (`6acf8d092ac6799e5df37edb`). Cierra Derek #123 | /wellness-membership | — |
+| [x] | Wellness `#fit`: sin imagen, Figma **0364** (`6acf8d11227afeea63cbd752`). Cierra #120, necesita slot nuevo | /wellness-membership | — |
+| [x] | NP after-booking: prod 0012, Figma **0006** (`6acf8d07881c57a68acf0b58`) | /new-patients | — |
+| [x] | Injury hero: prod 0052, Figma **0017** (`6acf8d08b2c2a07372858cdd`); csw-bridge prod 0292, Figma **0289** (`6acf8d10f74043494266d5da`) | /care/sports-activity-overuse-injuries | — |
+| [x] | Patient Stories hero: prod 0017, Figma **0018** (`6ab983675fd04c4dc1b1a6cc`, sin versión 2560w). Derek #110 | /patient-stories | — |
+| [ ] | 0141 (Team), 0246 (NP hero), 0206 (Team CTA): mismo foto que el batch y ya ≥2x. El batch cambia el encuadre y Page Header / Team Member no tienen prop de focal point. No se cambian sin decidir | /team · /new-patients | — |
+| [x] | 0142 Our Story: se queda el recorte (pedido del cliente) | /our-story#our-clinic | — |
+| [x] | Publicado en webflow.io 2026-11-09 (task b04bb971). Renders OK a 1440/768/390, sin scroll horizontal | — | — |
+| [ ] | Wellness hero a 390: Page Header recorta 0043 a 350x219 y corta la cara de Kati arriba. Page Header no tiene focal point; decidir si se agrega prop "Image Position" al componente | /wellness-membership | COMPONENTS-NAMING |
+| [ ] | `#fit` nuevo layout: clases `fit_layout`, `fit_media`, `fit_img`, `fit_copy` y combo `includes_head.cc-left`. Se dejaron los h3 de cada camino (el Figma los funde en el párrafo). Documentar en COMPONENTS-NAMING | /wellness-membership#fit | COMPONENTS-NAMING |
+| [ ] | Replies de Pastel #44, #43, #70, #73, #120, #123, #110: borrador para que Pablo revise antes de postear | — | — |
+
+## 2026-11-09 · Excel de Derek (image_manifest_0.36) contra el sitio
+
+| ✓ | Qué | Prod | Doc |
+| --- | --- | --- | --- |
+| [x] | Patient Stories hero: volver a **0017** (Excel + Pastel #71). Hoy 0018 por el swap del Figma | /patient-stories | — |
+| [x] | Injury hero: volver a **0052** (Excel). Hoy 0017 por el swap del Figma | /care/sports-activity-overuse-injuries | — |
+| [x] | Blog hero: Frame 427319277.png → **0243** batch | /blog | — |
+| [x] | Archivos no-batch (misma foto, #44): doctor-kati-schwabe-consult → 0238, cost-of-waiting-ski → snow_tracks (Home + 404), 007_dr-schwabe-reception → 0092, Fees 0264 con logo → 0264 sin logo, imágenes CMS del blog → long_appointment / 0340 / 0073 | varias | — |
+| [x] | Recortes re-exportados 0141, 0246, 0142: mismo color que el batch y ≥2x, se quedan (0142 tiene el ajuste de cielo pedido). Fees 0264 con logo también es archivo del batch, se queda | /team · /new-patients · /our-story | — |
+| [ ] | Care prenatal, plantar, headaches-tmj, wellness dan 404 en staging. Imágenes del Excel: prenatal_hero, 0012 + 0339 (no está en assets), 0044, 0063 | /care/* | — |
+| [x] | Blog "Staying Active" (publicado por Pablo 9/11): item en draft con cambios del 15/10 sin publicar. Imagen ya cambiada a 0073 batch en el CMS, falta OK de Pablo para publicar el item | /blog/staying-active-colorado-as-you-age | — |
+| [x] | Focal point heroes: props nuevos `Image Focus Y` (Page Header) y `Photo Focus Y` (Injury Hero) → `data-img-y` en la foto, CSS en `src/styles/img-focus.css` (0–100 de a 10). Wellness e Injury en 20. Se ve recién con el deploy | /care/sports-activity-overuse-injuries | — |
+| [x] | Publicado webflow.io 2026-11-09 (task 7d400806). Verificado por scrape: todo sirve archivos del batch | — | — |
+
+## 2026-11-09 · Pastel #38 · #41 · #43
+
+| ✓ | Qué | Prod | Doc |
+| --- | --- | --- | --- |
+| [x] | #38 flicker de "In their own words": el `backdrop-filter: blur(2px)` de `testimonials_scrim` se repintaba en cada frame del scroll (Lenis). Sacado; el blur pasó a `testimonials_bg` como `filter: blur(2px)` + `transform: scale(1.02)` (estático, no se repinta) | / | — |
+| [x] | #41 botones en una línea en phone: `.button` tiny → font-size .8125rem, padding-x .875rem; `.button.cc-icon-circle` tiny → gap .4em; `.feature_card.cc-text` small → padding 1.5rem (era 2rem, apretaba el CTA de FAQ). Medido a 375 y 390: todos los "Book…" y "Read Dr. Schwabe's…" en una línea | sitio | — |
+| [x] | (resuelto 12/11, ver abajo) #41 los 6 botones de Colorado Shockwave siguen en 2 líneas (Learn about…, See… pricing, See more… patient stories). No entran sin sacar la flecha en phone o acortar el label. Esperando respuesta de Derek | / · /care · /fees · /patient-stories · care pages | — |
+| [x] | #43 asset viejo 0245 (6ab98368…): ya no existe en Assets, solo queda 6acf8cb2… | — | — |
+| [x] | Publicado webflow.io (task b2360e71) | — | — |
+| [x] | (deploy hecho 12/11, hash `@7d5c8b1`) #43 + #44 focal + #34 Cost of Waiting: commits `123ad86`, `b3d9efa` y `7d5c8b1` locales en main, **falta `git push`** y subir el hash de jsDelivr de `@07ee706` a `@7d5c8b1` en el Custom Code | — | `src/styles/cta-crop.css` |
+| [x] | #34 respuesta de Derek (10/11): Cost of Waiting en tablet y phone dejaba eyebrow y H2 centrados (`cost-head_title` es flex centrado y no matcheaba `_title-block`). Fix en `align-rule.css` → `[class*='_title']`, commit `7d5c8b1`. Responder después del deploy | / #the-cost-of-waiting | `src/styles/align-rule.css` |
+
+## 2026-11-12 · Links Schwabe → Colorado Shockwave
+
+| ✓ | Qué | Prod | Doc |
+| --- | --- | --- | --- |
+| [x] | Fees "See CS pricing" → `coloradoshockwave.com/first-visit#pricing` (sin barra final, Webflow no la usa) | /fees-and-policies | — |
+| [x] | Patient Stories "See more CS patient stories" → `coloradoshockwave.com/patient-stories` | /patient-stories | — |
+| [x] | FAQ "What conditions is shockwave commonly used for?" → `coloradoshockwave.com/conditions` | /faq | — |
+| [x] | Se quedan en la home de CS (pedido de Derek #59): Home x2, bridges de Care / Back & Neck / Sports, FAQ "What is CS?", Fees "coloradoshockwave.com." | — | — |
+| [ ] | Blog: "Learn more about Colorado Shockwave® and when it may be a good fit." (Staying Active) sin link → `/how-it-works`; post de plantar → `/conditions/plantar-fasciitis`. A mano en el CMS (rich text) | /blog/* | — |
+| [x] | Verificado: todas las URLs de destino dan 200 en colorado-shockwave-wup.webflow.io. coloradoshockwave.com hoy redirige a schwabechiropractic.com/shockwave hasta que se conecte el dominio | — | — |
+| [x] | #41 Derek eligió labels cortos: default del prop Button Label en What Makes This Different, Colorado Shockwave y Shockwave Bridge → "Visit Colorado Shockwave®"; Patient Stories → "More Colorado Shockwave® stories". Medido a 375/390: entran en una línea | / · /care · care pages · /patient-stories | — |
+| [x] | #41 Fees: label → "Colorado Shockwave® pricing" (default del prop en Shockwave Fees, OK de Pablo). Entra en una línea a 375/390 | /fees-and-policies | — |
+| [x] | 2026-11-12: el hash quedó tipeado `@07d5c8b1` (404 en jsDelivr, sitio sin CSS/JS custom). Corregido a `@7d5c8b1` en el head del sitio y republicado. Pastel #34, #43, #44, #48 resueltos; #41 respondido y abierto | — | — |

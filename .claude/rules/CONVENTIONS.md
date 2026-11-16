@@ -1,5 +1,20 @@
 # Conventions
 
+## Webflow editor text: English only (hard rule)
+
+Everything the client can see inside Webflow is written in **English**, never Spanish:
+CMS field names and help texts, component names, descriptions, prop names, prop
+tooltips and groups, Navigator display names, page titles and asset alt text.
+
+- A CMS help text or component description is a short plain description of the
+  field or section for the editor. No dev notes, no file references, no Pastel
+  numbers, no "copy v0_2", no history of what changed.
+- Spanish notes live only in this repo (`.claude/rules/*`), never in Webflow.
+- Before publishing, grep new help texts and descriptions for Spanish.
+
+Reason: Derek (client) saw Spanish help texts in the FAQs collection and
+33 Spanish component descriptions on 2026-11-12. All translated that day.
+
 ## Language & Modules
 
 - ES modules everywhere (`import`/`export`), never CommonJS (`require`/`module.exports`)

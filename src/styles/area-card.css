@@ -65,7 +65,7 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
    Learn more link inside the card takes focus, which is what makes the
    state reachable without a mouse. */
 
-[data-area-card]:focus-within {
+[data-area-card]:has(:focus-visible) {
   background-color: var(--area-bg-hover);
   border-color: var(--area-border-hover);
   color: var(--area-fg-hover);
@@ -87,7 +87,7 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
    `.button` rules and the tie is decided by stylesheet load order, which
    this project does not control. Same trick as `button.css`. */
 
-[data-area-card][data-area-card]:focus-within .button {
+[data-area-card][data-area-card]:has(:focus-visible) .button {
   color: var(--area-fg-hover);
   border-color: var(--area-fg-hover);
 }
@@ -107,7 +107,7 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
    /care). Inside an inverted card the button hovers like a Secondary on a
    dark band instead: beige label, beige 12% wash. Done by re-pointing the
    button's own hover variables, so button.css keeps the single hover rule. */
-[data-area-card][data-area-card]:focus-within [data-btn] {
+[data-area-card][data-area-card]:has(:focus-visible) [data-btn] {
   --btn-fg-hover: var(--area-fg-hover);
   --btn-bg-hover: color-mix(
     in srgb,
@@ -139,3 +139,22 @@ Loaded from global.js, so it ships in dist/styles.css on every page.
 /* No anti-FOUC CSS, deliberately: nothing here is hidden. The resting card
    is the card's static state, and if this stylesheet never loaded the grid
    would still read correctly — it would simply never invert. */
+
+/* Pastel 978216 #80 (2026-11-16): on iPhone a tap focused the card's link,
+   `:focus-within` turned the card dark and the copy stayed dark (its colour
+   comes from the text classes, not from the card). Two changes:
+   1. The dark state is keyboard focus only (`:focus-visible`), never a tap.
+      On touch the card stays light and the tap just follows the link.
+   2. Whenever the card IS dark (mouse hover or keyboard focus), every line
+      of copy inside it goes light, not only what inherits `color`. */
+[data-area-card][data-area-card]:has(:focus-visible)
+  :is(h2, h3, h4, p, .heading-text, .plain-text) {
+  color: var(--area-fg-hover);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-area-card][data-area-card]:hover
+    :is(h2, h3, h4, p, .heading-text, .plain-text) {
+    color: var(--area-fg-hover);
+  }
+}

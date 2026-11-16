@@ -57,14 +57,24 @@ function init(root) {
     if (g !== group) g.remove()
   })
   let clones = []
+
+  // Clones are decoration for the seamless loop: hidden from screen readers
+  // and out of the tab order. NOT `inert`: inert also blocks :hover, so only
+  // the original cards (the ones that start on the left) showed the olive
+  // border on hover (Pastel 978216 #35, 2026-11-11).
+  function hideClone(node) {
+    node.setAttribute('aria-hidden', 'true')
+    node
+      .querySelectorAll('a, button, input, select, textarea, [tabindex]')
+      .forEach((el) => el.setAttribute('tabindex', '-1'))
+  }
   let period = 0 // width of one group + the gap after it
 
   function build() {
     clones.forEach((c) => c.remove())
     clones = []
     const first = group.cloneNode(true)
-    first.setAttribute('aria-hidden', 'true')
-    first.inert = true
+    hideClone(first)
     track.appendChild(first)
     clones.push(first)
     period = first.offsetLeft - group.offsetLeft
@@ -72,7 +82,7 @@ function init(root) {
     const needed = Math.ceil(root.clientWidth / period) + 1
     for (let i = 1; i < needed; i += 1) {
       const c = first.cloneNode(true)
-      c.inert = true
+      hideClone(c)
       track.appendChild(c)
       clones.push(c)
     }
