@@ -72,6 +72,7 @@ import pillLinks from '../utils/pill-links.js'
 import imgFocus from '../utils/img-focus.js'
 import jobStartOpen from '../utils/job-start-open.js'
 import customSelect from '../utils/custom-select.js'
+import openings from '../utils/openings.js'
 
 export default function () {
   armFoucFailsafe()
@@ -86,6 +87,7 @@ export default function () {
   sectionTight()
   pillLinks()
   imgFocus()
+  openings()
   jobStartOpen()
   customSelect()
 }

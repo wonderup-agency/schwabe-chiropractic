@@ -98,3 +98,15 @@ details.job-card[open] > .job-card_summary > .job-card_icon::after {
 .job-card_rich p {
   margin: 0;
 }
+
+/* #85: the "no open roles" message only shows when openings.js finds no
+   active role. The Start Open marker is never visible. */
+[data-openings-empty] {
+  display: none;
+}
+[data-openings-empty].is-visible {
+  display: block;
+}
+[data-job-start-open] {
+  display: none;
+}

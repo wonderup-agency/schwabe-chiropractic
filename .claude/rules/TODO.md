@@ -25,9 +25,9 @@ CDN del bundle: **`@970fb4b`** · último commit pusheado: **`d8553d2`**
 | [x] | 81 | Care heroes en phone/tablet | Webflow: `cc-injury-context` medium `margin-top -4rem` + `padding-top 6.5rem`; `injury-hero_media` medium 5/4, small 4/5. `img-focus.js` acepta cualquier 0–100, `%`, top/center/bottom. Tooltips de Focus Y actualizados |
 | [x] | 84 | Dropdown custom | `custom-select.js` + `select.css`: botón con las clases del select + listbox; el select nativo queda oculto para el submit. Opt-out `data-native-select` |
 | [x] | 82  83 84 86 87 88 90 | Fees, labels Join, select, eyebrows Contact, read time | Aplicado por MCP |
-| [ ] | 83 | Placeholders del form de Join | Pablo a mano en el Designer (MCP no los setea) |
-| [ ] | 90 | Borrar campo CMS `read-time` de Blogs | Necesita OK de Pablo (el clasificador lo bloqueó) |
-| [ ] | 85 | Job cards editables | Colección **Open Roles** creada (`6afb3e90f504c750962ae7e1`) con los 2 roles. La Collection List NO se puede armar por MCP: dentro del componente no hay contexto CMS y sort/filter fallan con "[Conflict] component map". Falta en el Designer: Collection List en Current Openings, filtro Active=on, sort Sort Order asc, bindings, marker `[data-job-start-open]` con visibilidad = Start Open, rich text con clase `job-card_rich`, empty state. CSS y JS ya están (`job-card.css`, `job-start-open.js`) |
+| [x] | 83 | Placeholders del form de Join | Pablo a mano en el Designer |
+| [x] | 90 | Campo CMS `read-time` de Blogs borrado | OK de Pablo 2026-11-16 |
+| [x] | 85 | Job cards por CMS | Instancia de *Section / Current Openings* desvinculada en Join (el componente queda sin uso). Collection List de Open Roles a nivel página: item con visibilidad = Active y `data-job-sort` = Sort Order; `openings.js` ordena y muestra el mensaje `[data-openings-empty]` si no hay roles activos; marker `[data-job-start-open]` con visibilidad = Start Open. El API no permite sort/filter en Collection Lists ("[Conflict] component map"), por eso va por JS |
 | [ ] | 41 | Botones que hacen wrap en 375 | Abierto a pedido de Pablo |
 
 ## Pastel 978216 (Derek, ronda 2026-11-03) · Fase 1 por código
