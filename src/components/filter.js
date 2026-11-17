@@ -56,6 +56,7 @@ function apply(group, value) {
     control.classList.toggle(ACTIVE, on)
     control.setAttribute('aria-pressed', String(on))
   })
+  if (group.onChange) group.onChange(value)
 
   // Nothing matched. Better to show everything than an empty grid — a filter
   // with no results reads as a broken page, and the CMS can always drift.
@@ -65,6 +66,125 @@ function apply(group, value) {
     })
     console.warn(`[filter] no items matched "${value}" — showing all`)
   }
+}
+
+
+/*
+Punch-list 2026-11-17: when there are many categories, a dropdown instead of
+chips. If the control group has at least `data-filter-dropdown-at` visible
+options (counting "All"), the chip row is hidden and replaced by a custom
+dropdown that drives the same filter. Default 7, so up to 6 options stay as
+chips. The chips stay in the DOM (and visible without JS).
+*/
+function sortKey(control) {
+  const n = parseFloat(control.closest('[data-cms-sort]')?.getAttribute('data-cms-sort'))
+  return Number.isFinite(n) ? n : Infinity
+}
+
+let dropdownId = 0
+function buildDropdown(controlGroup, controls, group) {
+  const id = `filter-dd-${++dropdownId}`
+  const label = (c) => c.textContent.trim()
+  const fixed = controls.filter((c) => !c.closest('.w-dyn-item'))
+  const cms = controls
+    .filter((c) => c.closest('.w-dyn-item'))
+    .map((c, i) => ({ c, i, k: sortKey(c) }))
+    .sort((a, b) => a.k - b.k || a.i - b.i)
+    .map((o) => o.c)
+  const options = [...fixed, ...cms]
+
+  const wrap = document.createElement('div')
+  wrap.className = 'filter-dropdown'
+  const trigger = document.createElement('button')
+  trigger.type = 'button'
+  trigger.className = 'filter-dropdown_trigger'
+  trigger.setAttribute('aria-haspopup', 'listbox')
+  trigger.setAttribute('aria-expanded', 'false')
+  trigger.setAttribute('aria-controls', `${id}-list`)
+  const aria = controlGroup.getAttribute('aria-label')
+  if (aria) trigger.setAttribute('aria-label', aria)
+
+  const list = document.createElement('ul')
+  list.className = 'custom-select_list filter-dropdown_list'
+  list.id = `${id}-list`
+  list.setAttribute('role', 'listbox')
+  list.tabIndex = -1
+  list.hidden = true
+
+  const items = options.map((c, i) => {
+    const li = document.createElement('li')
+    li.className = 'custom-select_option'
+    li.id = `${id}-opt-${i}`
+    li.setAttribute('role', 'option')
+    li.textContent = label(c)
+    li.dataset.value = c.dataset.filter
+    return li
+  })
+  list.append(...items)
+  wrap.append(trigger, list)
+
+  let active = 0
+  const setActive = (i) => {
+    active = Math.max(0, Math.min(items.length - 1, i))
+    items.forEach((li, n) => li.classList.toggle('is-active', n === active))
+    list.setAttribute('aria-activedescendant', items[active].id)
+    items[active].scrollIntoView({ block: 'nearest' })
+  }
+  const open = () => {
+    if (!list.hidden) return
+    list.hidden = false
+    wrap.classList.add('is-open')
+    trigger.setAttribute('aria-expanded', 'true')
+    const sel = items.findIndex((li) => li.getAttribute('aria-selected') === 'true')
+    setActive(sel >= 0 ? sel : 0)
+    list.focus({ preventScroll: true })
+  }
+  const close = (refocus = true) => {
+    if (list.hidden) return
+    list.hidden = true
+    wrap.classList.remove('is-open')
+    trigger.setAttribute('aria-expanded', 'false')
+    if (refocus) trigger.focus({ preventScroll: true })
+  }
+  const pick = (i) => {
+    apply(group, items[i].dataset.value)
+    close()
+  }
+
+  group.onChange = (value) => {
+    const li = items.find((x) => x.dataset.value === value) || items[0]
+    trigger.textContent = li.textContent
+    items.forEach((x) => x.setAttribute('aria-selected', String(x === li)))
+  }
+
+  trigger.addEventListener('click', () => (list.hidden ? open() : close()))
+  trigger.addEventListener('keydown', (e) => {
+    if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key)) {
+      e.preventDefault()
+      open()
+    }
+  })
+  list.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') setActive(active + 1)
+    else if (e.key === 'ArrowUp') setActive(active - 1)
+    else if (e.key === 'Home') setActive(0)
+    else if (e.key === 'End') setActive(items.length - 1)
+    else if (e.key === 'Enter' || e.key === ' ') pick(active)
+    else if (e.key === 'Escape') close()
+    else if (e.key === 'Tab') return close(false)
+    else return
+    e.preventDefault()
+  })
+  items.forEach((li, i) => {
+    li.addEventListener('mousemove', () => active !== i && setActive(i))
+    li.addEventListener('click', () => pick(i))
+  })
+  document.addEventListener('pointerdown', (e) => {
+    if (!wrap.contains(e.target)) close(false)
+  })
+
+  controlGroup.classList.add('is-dropdown')
+  controlGroup.after(wrap)
 }
 
 function bind(controls, group) {
@@ -112,6 +232,10 @@ export default function (elements) {
 
         const group = { controls, items }
         bind(controls, group)
+
+        const visible = controls.filter((c) => !c.closest('.w-condition-invisible'))
+        const at = parseInt(controlGroup.dataset.filterDropdownAt || '7', 10)
+        if (visible.length >= at) buildDropdown(controlGroup, visible, group)
 
         // Honour whichever control the Designer marked active, so the default
         // state lives in Webflow and not in this file.

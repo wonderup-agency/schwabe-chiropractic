@@ -140,3 +140,70 @@ Scoped to .themes_filter so the Blog chips keep their own style.
 [data-filter-value] .w-dyn-item > * {
   display: inline;
 }
+
+/* Punch-list 2026-11-17: dropdown version of the filter, built by filter.js
+   when there are too many chips. Same look as the form dropdown
+   (custom-select_* in select.css), sized for the section header. */
+[data-filter-controls].is-dropdown {
+  display: none;
+}
+.filter-dropdown {
+  position: relative;
+  width: 100%;
+  max-width: 18rem;
+  color: rgb(71, 77, 51);
+}
+.filter-dropdown::after {
+  content: '';
+  position: absolute;
+  right: 1.125rem;
+  top: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-70%) rotate(45deg);
+  transition: transform 0.2s ease;
+  pointer-events: none;
+}
+.filter-dropdown.is-open::after {
+  transform: translateY(-30%) rotate(-135deg);
+}
+.filter-dropdown_trigger {
+  display: block;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.5rem 2.75rem 0.5rem 1.125rem;
+  border: 1px solid #cacdb7;
+  border-radius: 999px;
+  background-color: #fbfaf8;
+  color: inherit;
+  font: inherit;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.filter-dropdown_trigger:focus-visible {
+  outline: 2px solid var(--_color---brand--olive-green);
+  outline-offset: 2px;
+}
+.filter-dropdown_list {
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+@media (max-width: 767px) {
+  .filter-dropdown {
+    max-width: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .filter-dropdown::after {
+    transition: none;
+  }
+}

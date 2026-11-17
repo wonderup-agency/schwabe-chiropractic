@@ -47,7 +47,9 @@ CDN del bundle: **`@970fb4b`** · último commit pusheado: **`d8553d2`**
 | [x] | — | Páginas internas a draft | /styles, /components, /basic-layouts, /inspired-layouts, /test: 404 y fuera del sitemap |
 | [ ] | — | Free Guide: prop de imagen | Hoy no hay prop de imagen; el form está en Settings como "Free Guide Form" (Home y Blog template) |
 | [ ] | — | Rename "Section / Injury …" → "Section / Care Page …" | Esperando OK de Pablo |
-| [ ] | — | Chips del blog | Son estáticos: categoría nueva = opción en CMS + chip en el Designer con el mismo texto. En mobile hacen wrap (4 chips = 3 filas) |
+| [x] | — | Categorías del blog por CMS | Colección **Blog Categories** (Name, Sort Order, Show Chip) + referencia simple **Category** en Blogs (multi-ref descartado por Pablo). Chips = Collection List con `u-display-contents`; orden por `cms-sort.js`; scroll horizontal en mobile |
+| [x] | — | Dropdown de filtros | `filter.js`: con `data-filter-dropdown-at` opciones o más (default 7) arma un dropdown custom en vez de chips. **En test con 4 en el Blog: sacar el atributo para volver a 7** |
+| [ ] | — | Borrar Option viejo "Category" de Blogs | Renombrado "Category (old, not used)"; el clasificador bloqueó el borrado |
 | [ ] | 3 | `<br>` en headings | No se ocultan en mobile: los 4 que hay son cortes de oración intencionales (Membership, Patient Stories, Join) |
 
 ## Pastel 978216 (Derek, ronda 2026-11-03) · Fase 1 por código
