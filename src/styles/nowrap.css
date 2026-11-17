@@ -1,0 +1,5 @@
+/* Punch-list 2026-11-16: keeps short hyphenated words on one line.
+   Added by src/utils/hyphen-nowrap.js, also usable by hand. */
+.u-nowrap {
+  white-space: nowrap;
+}

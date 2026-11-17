@@ -58,6 +58,7 @@ import '../styles/section-tight.css'
 import '../styles/faq-nav.css'
 import '../styles/cta-crop.css'
 import '../styles/img-focus.css'
+import '../styles/nowrap.css'
 import { armFoucFailsafe } from '../utils/motion.js'
 import formatRegistered from '../utils/registered.js'
 import fixImageSizes from '../utils/image-sizes.js'
@@ -72,11 +73,15 @@ import pillLinks from '../utils/pill-links.js'
 import imgFocus from '../utils/img-focus.js'
 import jobStartOpen from '../utils/job-start-open.js'
 import customSelect from '../utils/custom-select.js'
+import skipLinkFirst from '../utils/skip-link-first.js'
+import hyphenNowrap from '../utils/hyphen-nowrap.js'
 import openings from '../utils/openings.js'
 
 export default function () {
   armFoucFailsafe()
   formatRegistered()
+  hyphenNowrap()
+  skipLinkFirst()
   fixImageSizes()
   anchorScroll()
   telLinks()

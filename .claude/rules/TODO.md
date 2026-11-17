@@ -30,6 +30,20 @@ CDN del bundle: **`@970fb4b`** · último commit pusheado: **`d8553d2`**
 | [x] | 85 | Job cards por CMS | Instancia de *Section / Current Openings* desvinculada en Join (el componente queda sin uso). Collection List de Open Roles a nivel página: item con visibilidad = Active y `data-job-sort` = Sort Order; `openings.js` ordena y muestra el mensaje `[data-openings-empty]` si no hay roles activos; marker `[data-job-start-open]` con visibilidad = Start Open. El API no permite sort/filter en Collection Lists ("[Conflict] component map"), por eso va por JS |
 | [ ] | 41 | Botones que hacen wrap en 375 | Abierto a pedido de Pablo |
 
+## Punch-list de Derek (Slack 2026-11-16, SCHWABE-34)
+
+| ✓ | Bloque | Qué | Nota |
+| --- | --- | --- | --- |
+| [x] | 1 | Nav "New Patients" → "What to Expect" | DropdownLink en *Nav* |
+| [x] | 1 | Alt del pasillo (Our Story) | Prop nuevo **Image Alt** en *Section / The Space* |
+| [x] | 1 | Skip link | `id="main"` en 19 páginas + `main` nuevo en 404 y Thank You |
+| [x] | 1 | Form de Join renombrado | Mismo form ID, envíos OK, sin webhooks. Preguntar a Derek por Zapier/Make |
+| [x] | 3 | Announcement bar | Ya era un componente (26 instancias, sin overrides). Link default → URL nueva de Maps. Editable solo desde el Designer (defaults del componente) |
+| [x] | 3 | Skip link primero en el Tab | `skip-link-first.js` lo mueve al inicio del body |
+| [x] | 3 | Headings balanceados | `.heading-text` → `text-wrap: balance` (antes heredaba `pretty` del body) |
+| [x] | 3 | Palabras con guion | `hyphen-nowrap.js` + `.u-nowrap`; palabras de hasta 24 caracteres |
+| [ ] | 3 | `<br>` en headings | No se ocultan en mobile: los 4 que hay son cortes de oración intencionales (Membership, Patient Stories, Join) |
+
 ## Pastel 978216 (Derek, ronda 2026-11-03) · Fase 1 por código
 
 | ✓ | # | Qué | Nota |
