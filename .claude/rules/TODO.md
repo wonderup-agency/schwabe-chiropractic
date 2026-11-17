@@ -42,6 +42,12 @@ CDN del bundle: **`@970fb4b`** · último commit pusheado: **`d8553d2`**
 | [x] | 3 | Skip link primero en el Tab | `skip-link-first.js` lo mueve al inicio del body |
 | [x] | 3 | Headings balanceados | `.heading-text` → `text-wrap: balance` (antes heredaba `pretty` del body) |
 | [x] | 3 | Palabras con guion | `hyphen-nowrap.js` + `.u-nowrap`; palabras de hasta 24 caracteres |
+| [x] | — | Announcement Bar sin props | Pablo 17/11: se sacaron los 5 props; texto y link quedan fijos dentro del componente, se edita una vez y aplica en las 26 páginas. On/off = Visibility del elemento raíz dentro del componente. Ojo: un Content editor no puede editar adentro de un componente sin props |
+| [x] | — | Shockwave Bridge y Conditions Treated opcionales | Prop **Show Section** (grupo Visibility) en ambos, ligado a la visibilidad de la sección |
+| [x] | — | Páginas internas a draft | /styles, /components, /basic-layouts, /inspired-layouts, /test: 404 y fuera del sitemap |
+| [ ] | — | Free Guide: prop de imagen | Hoy no hay prop de imagen; el form está en Settings como "Free Guide Form" (Home y Blog template) |
+| [ ] | — | Rename "Section / Injury …" → "Section / Care Page …" | Esperando OK de Pablo |
+| [ ] | — | Chips del blog | Son estáticos: categoría nueva = opción en CMS + chip en el Designer con el mismo texto. En mobile hacen wrap (4 chips = 3 filas) |
 | [ ] | 3 | `<br>` en headings | No se ocultan en mobile: los 4 que hay son cortes de oración intencionales (Membership, Patient Stories, Join) |
 
 ## Pastel 978216 (Derek, ronda 2026-11-03) · Fase 1 por código
