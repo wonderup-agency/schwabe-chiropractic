@@ -92,3 +92,51 @@ Scoped to .themes_filter so the Blog chips keep their own style.
     white-space: nowrap;
   }
 }
+
+/* Punch-list 2026-11-17: category chips come from the Blog Categories CMS
+   collection. Webflow wraps them in three divs; display: contents lets each
+   chip sit in the flex row like the hand-placed "All articles" chip. */
+[data-filter-controls] .w-dyn-list,
+[data-filter-controls] .w-dyn-items,
+[data-filter-controls] .w-dyn-item {
+  display: contents;
+}
+[data-filter-controls] .w-dyn-item.w-condition-invisible {
+  display: none;
+}
+[data-filter-controls] .filter-chip {
+  flex: none;
+  white-space: nowrap;
+}
+
+/* On phones the row scrolls sideways instead of stacking, so 6 to 8
+   categories stay one tidy line. */
+@media (max-width: 767px) {
+  [data-filter-controls] {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+  }
+  [data-filter-controls]::-webkit-scrollbar {
+    display: none;
+  }
+  [data-filter-controls] .filter-chip {
+    scroll-snap-align: start;
+  }
+}
+
+/* Several categories on one card: "Chiropractic Care, Active Living". */
+[data-filter-value] .w-dyn-items {
+  display: inline;
+}
+[data-filter-value] .w-dyn-item {
+  display: inline;
+}
+[data-filter-value] .w-dyn-item + .w-dyn-item::before {
+  content: ', ';
+}
+[data-filter-value] .w-dyn-item > * {
+  display: inline;
+}

@@ -25,9 +25,21 @@ const ACTIVE = 'cc-active'
  * text. The element is either visible (the blog card's category line) or
  * .u-sr-only (the patient quote card).
  */
-function valueOf(item) {
-  const node = item.querySelector('[data-filter-value]')
-  return node ? node.textContent.trim().toLowerCase() : ''
+function valuesOf(item) {
+  // Pastel/punch-list 2026-11-17: a blog post can have several categories
+  // (multi-reference). Inside [data-filter-value] they come as a nested
+  // Collection List, one .w-dyn-item per category; otherwise the whole text
+  // is the single value, as before.
+  const values = []
+  item.querySelectorAll('[data-filter-value]').forEach((node) => {
+    const nested = node.querySelectorAll('.w-dyn-item')
+    if (nested.length) {
+      nested.forEach((n) => values.push(n.textContent.trim().toLowerCase()))
+    } else {
+      values.push(node.textContent.trim().toLowerCase())
+    }
+  })
+  return values
 }
 
 function apply(group, value) {
@@ -35,7 +47,7 @@ function apply(group, value) {
   const all = wanted === '*'
 
   group.items.forEach((item) => {
-    const show = all || valueOf(item) === wanted
+    const show = all || valuesOf(item).includes(wanted)
     item.hidden = !show
   })
 

@@ -76,9 +76,11 @@ import customSelect from '../utils/custom-select.js'
 import skipLinkFirst from '../utils/skip-link-first.js'
 import hyphenNowrap from '../utils/hyphen-nowrap.js'
 import openings from '../utils/openings.js'
+import cmsSort from '../utils/cms-sort.js'
 
 export default function () {
   armFoucFailsafe()
+  cmsSort()
   formatRegistered()
   hyphenNowrap()
   skipLinkFirst()
